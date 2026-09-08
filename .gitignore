@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Data
+data/raw/*
+!data/raw/.gitkeep
+
+# Model artifacts
+*.pkl
+*.joblib
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Env / secrets
+.env
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
