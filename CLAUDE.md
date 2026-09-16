@@ -130,13 +130,14 @@ project pitch/motivation.
   of this, `total_loss_qty` and every `loss_reason1/2/3_occurred/unit/qty`
   column are **target leakage** — they directly encode the outcome and must
   never be used as model features, only to construct the target.
-- **Feature set (`df_model`, 15 columns)** after dropping leakage and
-  unreliable columns: `household_id` (grouping key, not a feature),
-  `crop_code`/`crop_name` (code is the model input, name is display),
-  `household_size`, `region_code`/`region_name` (same split), `is_rural`,
-  `survey_year`, the 6 rainfall columns, and `loss_occurred`. All ≤5.2%
-  missing (`crop_name` highest at 5.2%; most of the rest are the same ~381
-  rows from the known household-join gap).
+- **Feature set (`df_model`, 14 columns after all cleanup)** after dropping
+  leakage and unreliable columns: `household_id` (grouping key, not a
+  feature), `crop_code`/`crop_name` (code is the model input, name is
+  display), `household_size`, `region_code`/`region_name` (same split),
+  `is_rural`, `survey_year`, `rainfall_belg_mm`/`_pct_of_avg`,
+  `rainfall_meher_mm`/`_pct_of_avg`, and `loss_occurred`. All ≤5.2% missing
+  before cleanup (`crop_name` highest at 5.2%; most of the rest were the same
+  ~381 rows from the known household-join gap, dropped — see below).
 - **Dropped and why**: `loss_detail_*`/`loss_extra_*` (70-99.9% missing, some
   describe the loss circumstance itself → leakage risk too) · all
   `storage_*_unconfirmed` (69-98% missing, too sparse to trust) ·
@@ -144,7 +145,45 @@ project pitch/motivation.
   ambiguous timing relative to the loss event) · `crop_domain` (35% missing,
   redundant with crop identity) · `zone_code`/`woreda_code` (zone_code is a
   per-region local sequence, not nationally unique/comparable as-is) ·
-  `ph_saq07`/`ph_saq07_loss` (82-84% missing, semantics unconfirmed).
+  `ph_saq07`/`ph_saq07_loss` (82-84% missing, semantics unconfirmed) ·
+  `rainfall_annual_mm`/`_pct_of_avg` (timing leakage — see below).
+- **Missing values**: the 381-row household-join-gap cluster is **dropped**
+  (imputing region/rainfall for a row where it's genuinely unknown would
+  inject a wrong value into what's otherwise a real predictive signal).
+  `crop_code`/`crop_name` missing independently are **recoded to an explicit
+  "Unknown" category** (`-1`/`"UNKNOWN"`) rather than mode-imputed or
+  dropped, to avoid biasing toward the most common crop and to keep those
+  rows' `loss_occurred` label. Final `df_model` after this: 74,696 rows, 0
+  missing values.
+- **Duplicate check caught a real bug** (see the household-ID gotcha below) —
+  0 duplicates now, both full-row and on the natural
+  `household_id`+`crop_code`+`crop_name`+`survey_year` grain.
+- **Small sample sizes**: `region_name` (10 values) and `survey_year` (5
+  values) are low-cardinality with thousands of rows each, but `crop_name`
+  has 189 distinct values and 69 of them have fewer than 30 rows — a loss
+  rate computed on that few rows is mostly noise given the 6.5% base rate.
+  Not fixed at the data-prep stage; a model needs to either group rare crops
+  into an "other" bucket or accept it can't make a confident crop-specific
+  call for them.
+- **Two leakage risks beyond target leakage, both resolved**:
+  1. *Rainfall timing vs. the app's actual use*: `rainfall_annual_mm` covers
+     the full calendar year including Oct-Jan, the window *after* a typical
+     Meher harvest — i.e. during/after the loss event the app is meant to
+     warn about beforehand. ~16% of the annual total falls in that
+     post-harvest window, and it's only moderately correlated with the
+     Belg+Meher seasonal total (r=0.70/0.45), so it's real extra information
+     a farmer wouldn't have yet at prediction time — not just a restatement
+     of the seasonal figures. Also matches `description.md`'s own pitch,
+     which describes the input as "seasonal rainfall," not annual.
+     **Dropped `rainfall_annual_mm`/`_pct_of_avg` from `df_model` entirely.**
+  2. *Grouped leakage from `household_id`*: a household can report multiple
+     crops, so a naive random train/test split could put the same
+     household's rows on both sides, letting a model partly recognize a
+     specific household instead of learning a generalizable pattern.
+     **Train/test split uses `sklearn.model_selection.GroupShuffleSplit`
+     grouped on `household_id`** (80/20, `random_state=42`) — verified zero
+     `household_id` overlap between splits, and loss rate stays close to
+     6.5%/6.6% in both (not accidentally skewed by the grouping).
 
 ## Known gotchas when touching this pipeline
 
