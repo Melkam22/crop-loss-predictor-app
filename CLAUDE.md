@@ -30,9 +30,15 @@ project pitch/motivation.
   "fix" in the code; restore the raw folder instead.
 - `data/processed/` — tracked in git. `crop_loss_master_2011.csv` ...
   `_2021.csv` (one per wave) plus `crop_loss_master_all.csv` (all 5 waves
-  concatenated, with rainfall merged in — this is the file to use for
-  modeling) and `rainfall_region_dekadal.csv` (intermediate CHIRPS output,
-  region-level, still dekadal grain, pre-seasonal-aggregation).
+  concatenated, with rainfall merged in) and `rainfall_region_dekadal.csv`
+  (intermediate CHIRPS output, region-level, still dekadal grain,
+  pre-seasonal-aggregation). **`crop_loss_model_ready.csv`** (built at the
+  end of `02_feature_exploration.ipynb`) is the actual file to start
+  modeling from — `crop_loss_master_all.csv` reindexed down to the clean
+  13-column feature set, leakage/unreliable columns dropped, missing values
+  resolved, 0 duplicates, `household_id` still included and the data still
+  whole (not train/test split — see "Prediction task" below for why the
+  split is deliberately deferred to model-training time).
 - `model/`, `backend/`, `frontend/` — empty so far, not yet started.
 - `.kiro/steering/` — pulls `CLAUDE.md` in as Kiro's project memory
   (`project-context.md`) plus a `workflow.md` with environment/git
@@ -180,10 +186,18 @@ project pitch/motivation.
      crops, so a naive random train/test split could put the same
      household's rows on both sides, letting a model partly recognize a
      specific household instead of learning a generalizable pattern.
-     **Train/test split uses `sklearn.model_selection.GroupShuffleSplit`
-     grouped on `household_id`** (80/20, `random_state=42`) — verified zero
-     `household_id` overlap between splits, and loss rate stays close to
-     6.5%/6.6% in both (not accidentally skewed by the grouping).
+     Verified in `02_feature_exploration.ipynb` (now removed from that
+     notebook after verifying) that `sklearn.model_selection.GroupShuffleSplit`
+     grouped on `household_id` (80/20, `random_state=42`) gives zero
+     `household_id` overlap and a loss rate that stays close to 6.5%/6.6% in
+     both halves (not accidentally skewed by the grouping). **The actual
+     split is deliberately deferred to model-training time, not done in this
+     EDA/feature-prep notebook** — `crop_loss_model_ready.csv` is saved
+     whole, `household_id` included, ready to be split when training starts.
+     Plain `sklearn.model_selection.train_test_split` cannot be used for that
+     split as-is — it has no `groups` parameter, so a naive call would
+     reintroduce this exact leakage; use `GroupShuffleSplit` (or dedupe to
+     unique `household_id`s, split those, then filter rows by the result).
 
 ## Known gotchas when touching this pipeline
 
