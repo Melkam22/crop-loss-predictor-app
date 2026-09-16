@@ -2,8 +2,17 @@
 
 ## Environment
 
-- Conda env `lewagon` is the active Python environment. Run Python and
-  Jupyter through it; don't create a new venv.
+- pyenv-virtualenv `harvestguard` (Python 3.12.9) is this project's dedicated
+  environment — set via `pyenv local harvestguard` (`.python-version` in the
+  repo root), separate from the shared `lewagon` bootcamp environment so this
+  project's dependencies (shap, fastapi, streamlit, ...) can't drift into or
+  get broken by other coursework. Run Python and Jupyter through it; don't
+  create a new venv or reuse `lewagon`.
+- Dependencies are pinned in `requirements.txt` (`pip install -r
+  requirements.txt`). Keep it in sync with whatever's actually installed —
+  pin exact versions, this pipeline has already been bitten twice by
+  subtle version-dependent behavior (SPSS categorical-groupby OOM, a
+  float-precision ID bug).
 - Re-run the pipeline notebook end to end with:
   `jupyter nbconvert --to notebook --execute --inplace notebooks/01_data_exploration.ipynb`
 
