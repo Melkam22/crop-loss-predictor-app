@@ -35,10 +35,11 @@ project pitch/motivation.
   pre-seasonal-aggregation). **`crop_loss_model_ready.csv`** (built at the
   end of `02_feature_exploration.ipynb`) is the actual file to start
   modeling from — `crop_loss_master_all.csv` reindexed down to the clean
-  13-column feature set, leakage/unreliable columns dropped, missing values
-  resolved, 0 duplicates, `household_id` still included and the data still
-  whole (not train/test split — see "Prediction task" below for why the
-  split is deliberately deferred to model-training time).
+  12-column feature set, leakage/unreliable columns dropped, missing values
+  resolved, re-aggregated to one row per `household_id`+`crop_name`+
+  `survey_year` (72,762 rows), 0 duplicates, `household_id` still included
+  and the data still whole (not train/test split — see "Prediction task"
+  below for why the split is deliberately deferred to model-training time).
 - `model/`, `backend/`, `frontend/` — empty so far, not yet started.
 - `.kiro/steering/` — pulls `CLAUDE.md` in as Kiro's project memory
   (`project-context.md`) plus a `workflow.md` with environment/git
@@ -126,20 +127,22 @@ project pitch/motivation.
   without unit harmonization first (unsolved).
 - **Target**: `loss_occurred` = `(total_loss_qty.fillna(0) > 0)`. `NaN` in
   `total_loss_qty` means "no loss entry recorded for this crop," treated as
-  no-loss. Class split is **93.5% no-loss / 6.5% loss** — strongly
-  imbalanced; any model needs explicit handling (class weighting,
-  resampling, or a metric other than plain accuracy) rather than being
-  trained naively.
+  no-loss. Class split is **93.3% no-loss / 6.7% loss** in the final
+  `crop_loss_model_ready.csv` (93.5%/6.5% before the `crop_code` cleanup and
+  grain re-aggregation below nudged it slightly) — strongly imbalanced; any
+  model needs explicit handling (class weighting, resampling, or a metric
+  other than plain accuracy) rather than being trained naively.
 - **`total_loss_qty` itself is built from `loss_reason1/2/3_qty`** (summed
   across up to 3 reported loss reasons per household+crop, after first
   summing across that household's parcels/fields for the same crop). Because
   of this, `total_loss_qty` and every `loss_reason1/2/3_occurred/unit/qty`
   column are **target leakage** — they directly encode the outcome and must
   never be used as model features, only to construct the target.
-- **Feature set (`df_model`, 14 columns after all cleanup)** after dropping
+- **Feature set (`df_model`, 12 columns after all cleanup)** after dropping
   leakage and unreliable columns: `household_id` (grouping key, not a
-  feature), `crop_code`/`crop_name` (code is the model input, name is
-  display), `household_size`, `region_code`/`region_name` (same split),
+  feature), `crop_name` (the sole crop-identity feature — see why
+  `crop_code` was dropped entirely, below), `household_size`,
+  `region_code`/`region_name` (code is the model input, name is display),
   `is_rural`, `survey_year`, `rainfall_belg_mm`/`_pct_of_avg`,
   `rainfall_meher_mm`/`_pct_of_avg`, and `loss_occurred`. All ≤5.2% missing
   before cleanup (`crop_name` highest at 5.2%; most of the rest were the same
@@ -152,18 +155,33 @@ project pitch/motivation.
   redundant with crop identity) · `zone_code`/`woreda_code` (zone_code is a
   per-region local sequence, not nationally unique/comparable as-is) ·
   `ph_saq07`/`ph_saq07_loss` (82-84% missing, semantics unconfirmed) ·
-  `rainfall_annual_mm`/`_pct_of_avg` (timing leakage — see below).
+  `rainfall_annual_mm`/`_pct_of_avg` (timing leakage — see below) ·
+  **`crop_code` (dropped entirely, not just missing-value handled — see the
+  gotcha below; it isn't numeric for Wave 2013, and 439 of that wave's rows
+  have `crop_code` text that outright disagrees with `crop_name`)**.
 - **Missing values**: the 381-row household-join-gap cluster is **dropped**
   (imputing region/rainfall for a row where it's genuinely unknown would
   inject a wrong value into what's otherwise a real predictive signal).
-  `crop_code`/`crop_name` missing independently are **recoded to an explicit
-  "Unknown" category** (`-1`/`"UNKNOWN"`) rather than mode-imputed or
-  dropped, to avoid biasing toward the most common crop and to keep those
-  rows' `loss_occurred` label. Final `df_model` after this: 74,696 rows, 0
-  missing values.
-- **Duplicate check caught a real bug** (see the household-ID gotcha below) —
-  0 duplicates now, both full-row and on the natural
-  `household_id`+`crop_code`+`crop_name`+`survey_year` grain.
+  `crop_name` missing independently (5.2%) is **recoded to an explicit
+  "Unknown" category** (`"UNKNOWN"`) rather than mode-imputed or dropped, to
+  avoid biasing toward the most common crop and to keep those rows'
+  `loss_occurred` label.
+- **Duplicate check caught two real bugs**, not one:
+  1. See the household-ID float-precision gotcha below — fixed upstream in
+     `01_data_exploration.ipynb`.
+  2. Dropping `crop_code` (above) exposed ~1,934 rows that used to be
+     distinguished *only* by `crop_code` (e.g. two differently-coded plots of
+     the same named crop for one household) — almost all exact copies once
+     `crop_code` is gone, but 6 rows (3 pairs) had a genuine conflict: same
+     household+crop+year+rainfall context, but `loss_occurred` disagreed (1
+     vs 0). **Fixed by re-aggregating** `df_model` to one row per
+     `household_id`+`crop_name`+`survey_year`: covariates via `"first"`
+     (verified exactly constant within each group — they only depend on
+     `household_id`+`survey_year`, never on the dropped `crop_code`) and
+     `loss_occurred` via `"max"` (did this household have *any* loss on this
+     crop that year). This is what took `df_model` from 74,696 down to its
+     final 72,762 rows. 0 duplicates now, both full-row and on the
+     `household_id`+`crop_name`+`survey_year` grain.
 - **Small sample sizes**: `region_name` (10 values) and `survey_year` (5
   values) are low-cardinality with thousands of rows each, but `crop_name`
   has 189 distinct values and 69 of them have fewer than 30 rows — a loss
@@ -228,6 +246,22 @@ project pitch/motivation.
   touches `household_id` should pass `dtype={"household_id": str}`
   explicitly — don't rely on there happening to be zero nulls at read time to
   keep it as an integer type.
+- **`crop_code` is unreliable and not used as a feature — unresolved
+  upstream issue, documented but not fixed.** For Wave 2013 specifically,
+  `crop_code` in `crop_loss_master_all.csv` is not a numeric code at all —
+  it's crop-name text (18,302 of 18,305 Wave-2013 rows), because Wave 2013's
+  raw data only had a decoded crop-name field, backfilled into both
+  `crop_code` and `crop_name` (`01_data_exploration.ipynb` Part 3). Worse,
+  **439 of those rows have `crop_code` text that disagrees with
+  `crop_name`** (e.g. `crop_code="HARICOT BEANS"` next to
+  `crop_name="CACTUS"` on the same row) — a real construction bug in that
+  wave's build, not just inconsistent formatting. `02_feature_exploration.ipynb`
+  sidesteps this by dropping `crop_code` entirely and using `crop_name` as
+  the sole crop-identity feature, rather than fixing the root cause (which
+  would mean re-examining Wave 2013's `sect9a`/`sect10`/`sect11`/`sect12`
+  merge logic in `01_data_exploration.ipynb`). If `crop_code` is ever needed
+  again (e.g. to cross-reference an official LSMS crop-code list), this
+  Wave 2013 issue needs solving first.
 - The notebook can grow too large for the `Read` tool once it's been executed
   (outputs embedded). If `Read`/`NotebookEdit` fail on size, edit the
   underlying `.ipynb` JSON directly with a small Python script
