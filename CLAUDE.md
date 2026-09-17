@@ -39,9 +39,26 @@ project pitch/motivation.
   See the notebook's own "Reading the results" cell for the full confusion-
   matrix breakdown. A colleague is adding an XGBoost model on the same
   `X_train`/`X_test`/`y_train`/`y_test` to compare against this baseline.
+  **Feature importance — two methods, and they disagree**: scikit-learn's
+  default MDI (Mean Decrease in Impurity, training-data-based) ranks
+  `household_size` first by a wide margin (0.30), but permutation importance
+  (test-set-based, `sklearn.inspection.permutation_importance`, unbiased by
+  feature cardinality) drops it to #7 (0.006) and ranks `crop_name_TEFF`
+  first instead (0.054) — MDI is known to inflate continuous/high-cardinality
+  features like `household_size` relative to one-hot binary dummies.
+  **Permutation importance is the more trustworthy of the two.** Also
+  notable: the seasonal rainfall features don't make permutation
+  importance's top 15 at all (despite being central to the project's pitch —
+  worth revisiting), and two `region_code` dummies (15, 12) appear there
+  that weren't notable under MDI. No target-leakage columns show up in
+  either ranking. When a colleague compares this against XGBoost, they
+  should use XGBoost's permutation importance (or SHAP) rather than its
+  default `gain`/`weight` importance, so rankings are compared on the same
+  basis across models.
   **Not yet done**: no threshold tuning or alternative imbalance strategy
   (e.g. SMOTE) tried yet to improve precision; no model comparison/selection
-  step once XGBoost is added.
+  step once XGBoost is added; the rainfall-features-low-importance finding
+  above hasn't been investigated further.
 - `data/raw/` — gitignored, not tracked. Contains one folder per LSMS wave
   (`ETH_2011_ERSS_v02_M_CSV`, `ETH_2013_ESS_v03_M_SPSS`,
   `ETH_2015_ESS_v03_M_CSV`, `ETH_2018_ESS_v04_M_CSV`,
