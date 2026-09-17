@@ -184,8 +184,10 @@ project pitch/motivation.
      `household_id`+`crop_name`+`survey_year` grain.
 - **Small sample sizes**: `region_name` (10 values) and `survey_year` (5
   values) are low-cardinality with thousands of rows each, but `crop_name`
-  has 189 distinct values and 69 of them have fewer than 30 rows — a loss
-  rate computed on that few rows is mostly noise given the 6.5% base rate.
+  has 123 distinct values (189 before the Wave 2021 double-prefix bug was
+  fixed — see the gotcha below) and 33 of them have fewer than 30 rows — a
+  loss rate computed on that few rows is mostly noise given the 6.5% base
+  rate.
   Not fixed at the data-prep stage; a model needs to either group rare crops
   into an "other" bucket or accept it can't make a confident crop-specific
   call for them.
@@ -262,6 +264,18 @@ project pitch/motivation.
   merge logic in `01_data_exploration.ipynb`). If `crop_code` is ever needed
   again (e.g. to cross-reference an official LSMS crop-code list), this
   Wave 2013 issue needs solving first.
+- **Wave 2021's raw crop-label field can double the numeric prefix** — e.g.
+  `s9q00b` = `"2. 2.MAIZE"` instead of the normal `"2. MAIZE"` (confirmed in
+  `sect9_ph_w5.csv`). `split_code_label()`'s original regex only stripped one
+  `"N."` prefix, so 8,188 rows (~11% of the full dataset) ended up with
+  `crop_name` values like `"2.MAIZE"` instead of `"MAIZE"` — fragmenting 66
+  crops into two categories each (e.g. `"MAIZE"` and `"2.MAIZE"` both
+  existed). Caught via the one-hot-encoded column count in
+  `03_modeling.ipynb` looking too high, traced back to `01`. **Fixed**: the
+  regex now strips a repeated `"N."` prefix
+  (`r"^\s*(\d+)\.\s*(?:\d+\.\s*)*(.+?)\s*$"`, verified against every known
+  label format before applying). Distinct `crop_name` values dropped from
+  189 to 122 after re-running the full pipeline.
 - The notebook can grow too large for the `Read` tool once it's been executed
   (outputs embedded). If `Read`/`NotebookEdit` fail on size, edit the
   underlying `.ipynb` JSON directly with a small Python script
