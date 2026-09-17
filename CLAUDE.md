@@ -27,11 +27,21 @@ project pitch/motivation.
   14,419 rows), feature encoding (one-hot on `crop_name`/`region_code`/
   `survey_year`, fit on train only → `X_train`/`X_test`/`y_train`/`y_test`,
   144 columns), an X/y sanity check (no `NaN`s, all-numeric, index-aligned,
-  identical columns train vs test), and a plot confirming the ~93.3%/6.7%
-  class imbalance holds in both splits. **Not yet done**: no model has been
-  fit — next steps are a baseline classifier with imbalance handling
-  (`class_weight="balanced"` or resampling) and evaluation beyond plain
-  accuracy (precision/recall/F1/ROC-AUC).
+  identical columns train vs test), a plot confirming the ~93.3%/6.7% class
+  imbalance holds in both splits, and a **baseline `RandomForestClassifier`**
+  (`class_weight="balanced"`, `random_state=42`), chosen over Logistic
+  Regression because the 144-column one-hot feature space (dominated by
+  ~120+ sparse `crop_name` dummies) has interactions unlikely to be linear.
+  Test-set result: **ROC-AUC 0.750**, loss-class precision 0.17 / recall
+  0.58 / F1 0.26 (accuracy 0.78, not meaningful given the imbalance) —
+  catches 565 of 976 actual-loss rows at the cost of 2,784 false alarms, the
+  expected trade-off from `class_weight="balanced"` pushing recall up.
+  See the notebook's own "Reading the results" cell for the full confusion-
+  matrix breakdown. A colleague is adding an XGBoost model on the same
+  `X_train`/`X_test`/`y_train`/`y_test` to compare against this baseline.
+  **Not yet done**: no threshold tuning or alternative imbalance strategy
+  (e.g. SMOTE) tried yet to improve precision; no model comparison/selection
+  step once XGBoost is added.
 - `data/raw/` — gitignored, not tracked. Contains one folder per LSMS wave
   (`ETH_2011_ERSS_v02_M_CSV`, `ETH_2013_ESS_v03_M_SPSS`,
   `ETH_2015_ESS_v03_M_CSV`, `ETH_2018_ESS_v04_M_CSV`,
