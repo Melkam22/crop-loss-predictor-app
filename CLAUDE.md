@@ -21,6 +21,17 @@ project pitch/motivation.
   audits missingness, defines the `loss_occurred` binary target, drops
   leakage/unreliable columns, and leaves a clean `df_model` feature set. See
   "Prediction task" below for the details this notebook established.
+- `notebooks/03_modeling.ipynb` — starts from `crop_loss_model_ready.csv`.
+  Current state: grouped train/test split (`GroupShuffleSplit` on
+  `household_id`, 80/20, `random_state=42` — `train_df`/`test_df`, 58,343 /
+  14,419 rows), feature encoding (one-hot on `crop_name`/`region_code`/
+  `survey_year`, fit on train only → `X_train`/`X_test`/`y_train`/`y_test`,
+  144 columns), an X/y sanity check (no `NaN`s, all-numeric, index-aligned,
+  identical columns train vs test), and a plot confirming the ~93.3%/6.7%
+  class imbalance holds in both splits. **Not yet done**: no model has been
+  fit — next steps are a baseline classifier with imbalance handling
+  (`class_weight="balanced"` or resampling) and evaluation beyond plain
+  accuracy (precision/recall/F1/ROC-AUC).
 - `data/raw/` — gitignored, not tracked. Contains one folder per LSMS wave
   (`ETH_2011_ERSS_v02_M_CSV`, `ETH_2013_ESS_v03_M_SPSS`,
   `ETH_2015_ESS_v03_M_CSV`, `ETH_2018_ESS_v04_M_CSV`,
