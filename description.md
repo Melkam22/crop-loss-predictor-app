@@ -106,3 +106,9 @@ One deliberate design decision worth recording here: Belg and Meher rainfall wer
 by adding an XGBoost model on the same X_train_no_year/X_test_no_year/y_train/y_test (not the original, superseded X_train/X_test) to compare against rf_regularized, using a consistent importance method (permutation or SHAP) rather than each model's own default, so the comparison is apples-to-apples. Not yet done: threshold tuning, an alternative imbalance strategy (e.g. SMOTE), a sample-size check for the thinner region×crop combinations, and a final model choice once XGBoost's results are in.
 
 Everything is committed to notebooks/03_modeling.ipynb and pushed to GitHub.
+
+- 5. Frontend/backend input design (decided ahead of time, not yet built)
+
+Before backend/frontend work starts: not every feature the model needs should be a manual input field. crop_name and region (dropdown or GPS-resolved) are the two genuine user inputs. household_size is a judgment call — the model uses it and it's a reasonable thing to ask a farmer, but it wasn't in the original pitch's described inputs, so it needs a deliberate yes/no rather than defaulting into the form. is_rural should just be hardcoded/defaulted, since the app's whole audience is smallholder farmers — asking it would be pointless.
+
+The four rainfall columns (rainfall_belg_mm/_pct_of_avg, rainfall_meher_mm/_pct_of_avg) should never be manual entry fields — no farmer knows exact seasonal rainfall figures in mm or % of average. Instead, the FastAPI backend should fetch current-season rainfall automatically for the selected region (from CHIRPS or a similar live weather API, the same source the training data came from) once crop+region are chosen, and compute those four features server-side before calling the model. This changes what the backend's request schema looks like, so it's worth deciding now rather than after the endpoint is built.

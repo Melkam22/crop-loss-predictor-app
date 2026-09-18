@@ -106,6 +106,23 @@ project pitch/motivation.
   and the data still whole (not train/test split — see "Prediction task"
   below for why the split is deliberately deferred to model-training time).
 - `model/`, `backend/`, `frontend/` — empty so far, not yet started.
+  **Frontend input design, decided ahead of building it**: not every
+  feature the model needs should be a manual input field. `crop_name` and
+  `region_code` (dropdown, or GPS resolved to a region server-side) are the
+  genuine user inputs. `household_size` is a judgment call — the model uses
+  it and it's reasonable to ask a farmer, but it wasn't in the pitch's
+  original described inputs, so decide deliberately rather than defaulting
+  it into the form. `is_rural` should be hardcoded/defaulted, not asked —
+  the app's whole audience is smallholder farmers, so it's ~always 1.
+  **The four rainfall columns (`rainfall_belg_mm`/`_pct_of_avg`,
+  `rainfall_meher_mm`/`_pct_of_avg`) must never be manual entry fields** —
+  no farmer knows exact seasonal rainfall in mm or % of average. The
+  FastAPI backend should fetch current-season rainfall automatically for
+  the selected region (from CHIRPS or a similar live weather API, the same
+  source the training data came from) once crop+region are chosen, and
+  compute those four features server-side before calling the model. This
+  shapes the backend's request schema, so decide it before that endpoint is
+  built, not after.
 - `.kiro/steering/` — pulls `CLAUDE.md` in as Kiro's project memory
   (`project-context.md`) plus a `workflow.md` with environment/git
   conventions, so Kiro and Claude share one memory file instead of drifting
