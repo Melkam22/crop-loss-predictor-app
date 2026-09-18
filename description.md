@@ -4,7 +4,7 @@
 
 HarvestGuard is a machine learning web application that predicts
 the risk of post-harvest crop loss for smallholder farmers in
-Ethiopia. A user enters a region, crop type, and seasonal rainfall
+Ethiopia. Presumably, a user enters a region, crop type, and seasonal rainfall
 and receives an instant High or Low risk prediction.
 
 Built to support SDG 2 (Zero Hunger), SDG 9 (Innovation),
@@ -15,19 +15,19 @@ Ethiopian smallholder farmers lose 15–32% of crops post-harvest.
 Warning signs are missed until it is too late to intervene.
 
 ## Solution
-A FastAPI backend serves a trained XGBoost model. A Streamlit
+A FastAPI backend serves a trained models ex: Random Forest or XGBoost. A Streamlit
 frontend lets NGO officers and ministry staff act before losses
 occur — not after.
 
 ## Stack
-- Model: scikit-learn · XGBoost · SHAP
+- Model: scikit-learn · Random Forest · XGBoost · SHAP
 - Backend: FastAPI → Render
 - Frontend: Streamlit → Streamlit Cloud
 - Data: World Bank Database · CHIRPS Rainfall
 
 ## Data
 Two open CSV datasets merged on household_id, region + year:
-LSMS (World Bank Microdata Library) and CHIRPS rainfall data.
+LSMS (World Bank Microdata Library) and CHIRPS (Climate Hazards Group InfraRed Precipitation with Stations dataset, university of California, Santo Barbara) rainfall data.
 No satellite image processing required.
 
 ## The Simple Summary
@@ -42,9 +42,9 @@ The model doesn't save the grain. The people who act on the prediction save the 
 
 "According to FAO & Ethiopian Statistics Service (2023), post-harvest losses for maize, wheat, faba bean and haricot bean in Ethiopia range from 8% to 17% nationally. This survey provides the empirical basis for our loss risk threshold definition."
 
-That citation adds academic credibility without requiring us to use FAO as training data. We will reference it, and don't model with it.
+That citation ads acadacim credibility without using FAO resource as training data. We will reference it, and don't model with it.
 
-## For this project We will use LSMS + CHIRPS datasets
+## For this project We will use LSMS (Living Standards Measurement Study) + CHIRPS datasets (Climate/Remote Sensing)
 
 - LSMS (World Bank Microdata Library)
 The five available waves cover 2011-12, 2013-14, 2015-16, 2018-19, and 2021-22, with Wave 5 released in 2024. There is no 2023, 2024 or 2025 data — the survey is implemented every two years and all data is made publicly available within twelve months of completion of each wave. The next wave would realistically be collected in 2023-24 and released around 2026-2027 at earliest.
@@ -76,3 +76,31 @@ Aggregated the dekadal data up to Belg season, Meher season (Ethiopia's main gro
 Where things stand now: crop_loss_master_all.csv has 94 columns — the crop-loss/storage/loss fields from all 5 waves, plus region_code/region_name, plus 6 rainfall features. It's a single file ready to be used for the prediction task. We also cleaned up a region-code inconsistency (mixed formats and, for one wave, region names instead of codes) that would have quietly broken the rainfall merge.
 
 Everything is committed to notebooks/01_data_exploration.ipynb (which reproduces the whole pipeline end-to-end) and pushed to GitHub.
+
+- 3. Feature engineering & the prediction task (notebooks/02_feature_exploration.ipynb)
+
+Defined the actual prediction target: loss_occurred, a binary flag (True if any loss quantity was recorded for that household+crop+year, False otherwise) — matching the "High or Low risk" pitch above rather than regressing on loss quantity (those fields turned out to be in mixed, unnormalized units across reasons and waves, not safely comparable without extra work).
+
+Along the way we caught and fixed leakage risks beyond the obvious one:
+- Target leakage: total_loss_qty and every loss_reason*_occurred/unit/qty column are literally what the target is built from, so they can never be used as features — only to construct loss_occurred.
+- Timing leakage: rainfall_annual_mm covers months after a typical Meher harvest — information a farmer wouldn't have yet at prediction time. Dropped it entirely, keeping only the seasonal Belg/Meher figures.
+- Grouped leakage: a household can report multiple crops, so a random train/test split could put the same household on both sides and let a model partly memorize households instead of generalizing. Verified GroupShuffleSplit on household_id fixes it (the actual split itself is deliberately left for the modeling stage).
+
+Also caught and fixed two duplicate-row bugs during a duplicate/missing-value audit: a household-ID float-precision bug (pandas silently promoted IDs to float64 during a read/concat, colliding distinct IDs) and ~1,934 rows that were only distinguished by an unreliable crop_code field (dropped entirely rather than patched, after finding 439 Wave-2013 rows where crop_code text disagreed with crop_name).
+
+Where things stand now: `crop_loss_model_ready.csv` — 12 columns, 72,762 rows, 0 missing values, 0 duplicates, household_id still included and the data kept whole (not train/test split yet, by design). Target split: 93.3% no-loss / 6.7% loss — strongly imbalanced, so accuracy alone won't be a meaningful metric once training starts.
+
+- 4. Modeling — first baseline (notebooks/03_modeling.ipynb)
+
+Split crop_loss_model_ready.csv with GroupShuffleSplit grouped on household_id (80/20, zero household overlap confirmed), then one-hot encoded crop_name/region_code/survey_year — fit on train only, so test-set categories can't leak into the encoding — giving 144 columns going into the model.
+
+First baseline: RandomForestClassifier with class_weight="balanced" to counter the imbalance, chosen over Logistic Regression because the feature space (144 columns, dominated by sparse one-hot crop dummies) has interactions we'd expect to be nonlinear. Test-set result: ROC-AUC 0.750, loss-class precision 0.17 / recall 0.58 / F1 0.26 — it catches more than half of actual loss cases, at the cost of a lot of false alarms (an expected trade-off from class balancing, tunable later via the decision threshold).
+
+Checked which features the model actually leans on using two different importance methods, and they disagreed. Scikit-learn's default (Mean Decrease in Impurity, computed from training data) ranked household_size far ahead of everything else — but that measure is known to be biased toward continuous/high-cardinality features. Permutation importance (computed on the held-out test set instead, unbiased by that) tells a different story: household_size drops to 7th place, and crop_name_TEFF becomes the top feature. Also notable — the seasonal rainfall features don't make permutation importance's top 15 at all, which is a bit surprising given the pitch above leans on seasonal rainfall as an input; that's an open question, not yet resolved.
+
+One deliberate design decision worth recording here: Belg and Meher rainfall were kept as four separate columns (rainfall_belg_mm/_pct_of_avg, rainfall_meher_mm/_pct_of_avg) rather than merged into one rainfall figure. Ethiopia has two agriculturally distinct rainy seasons — Meher (Jun–Sep) is the main growing season for most crops, Belg (Feb–May) matters more for a smaller set of early-planted crops — so a single merged/summed number would blur that distinction and prevent the model from learning season-specific effects (e.g. that a poor Meher year hurts maize more than a poor Belg year does). A tree-based model like Random Forest can still learn crop×season interactions from the two separate columns without needing an explicit interaction feature. (The only rainfall figure that did get collapsed to a single annual number — rainfall_annual_mm — was dropped entirely instead of kept, for the timing-leakage reason above.)
+
+- My colleague continues from here:
+by adding an XGBoost model on the same train/test split to compare against this baseline, using a consistent importance method (permutation or SHAP) rather than each model's own default, so the comparison is apples-to-apples. Not yet done: threshold tuning, an alternative imbalance strategy (e.g. SMOTE), and a final model choice once XGBoost's results are in.
+
+Everything is committed to notebooks/03_modeling.ipynb and pushed to GitHub.
