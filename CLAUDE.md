@@ -22,43 +22,70 @@ project pitch/motivation.
   leakage/unreliable columns, and leaves a clean `df_model` feature set. See
   "Prediction task" below for the details this notebook established.
 - `notebooks/03_modeling.ipynb` — starts from `crop_loss_model_ready.csv`.
-  Current state: grouped train/test split (`GroupShuffleSplit` on
-  `household_id`, 80/20, `random_state=42` — `train_df`/`test_df`, 58,343 /
-  14,419 rows), feature encoding (one-hot on `crop_name`/`region_code`/
-  `survey_year`, fit on train only → `X_train`/`X_test`/`y_train`/`y_test`,
-  144 columns), an X/y sanity check (no `NaN`s, all-numeric, index-aligned,
-  identical columns train vs test), a plot confirming the ~93.3%/6.7% class
-  imbalance holds in both splits, and a **baseline `RandomForestClassifier`**
-  (`class_weight="balanced"`, `random_state=42`), chosen over Logistic
-  Regression because the 144-column one-hot feature space (dominated by
-  ~120+ sparse `crop_name` dummies) has interactions unlikely to be linear.
-  Test-set result: **ROC-AUC 0.750**, loss-class precision 0.17 / recall
-  0.58 / F1 0.26 (accuracy 0.78, not meaningful given the imbalance) —
-  catches 565 of 976 actual-loss rows at the cost of 2,784 false alarms, the
-  expected trade-off from `class_weight="balanced"` pushing recall up.
-  See the notebook's own "Reading the results" cell for the full confusion-
-  matrix breakdown. A colleague is adding an XGBoost model on the same
-  `X_train`/`X_test`/`y_train`/`y_test` to compare against this baseline.
-  **Feature importance — two methods, and they disagree**: scikit-learn's
-  default MDI (Mean Decrease in Impurity, training-data-based) ranks
-  `household_size` first by a wide margin (0.30), but permutation importance
-  (test-set-based, `sklearn.inspection.permutation_importance`, unbiased by
-  feature cardinality) drops it to #7 (0.006) and ranks `crop_name_TEFF`
-  first instead (0.054) — MDI is known to inflate continuous/high-cardinality
-  features like `household_size` relative to one-hot binary dummies.
-  **Permutation importance is the more trustworthy of the two.** Also
-  notable: the seasonal rainfall features don't make permutation
-  importance's top 15 at all (despite being central to the project's pitch —
-  worth revisiting), and two `region_code` dummies (15, 12) appear there
-  that weren't notable under MDI. No target-leakage columns show up in
-  either ranking. When a colleague compares this against XGBoost, they
-  should use XGBoost's permutation importance (or SHAP) rather than its
-  default `gain`/`weight` importance, so rankings are compared on the same
-  basis across models.
+  Grouped train/test split (`GroupShuffleSplit` on `household_id`, 80/20,
+  `random_state=42` — `train_df`/`test_df`, 58,343 / 14,419 rows).
+
+  **Official baseline: `rf_regularized`** — `RandomForestClassifier`
+  (`class_weight="balanced"`, `min_samples_leaf=10`, `random_state=42`)
+  trained on `X_train_no_year`/`X_test_no_year` (one-hot `crop_name` +
+  `region_code` only — `survey_year` deliberately excluded, see step 4
+  below — 139 columns). Test-set result: **ROC-AUC 0.808**, loss-class
+  precision 0.16 / recall 0.73 / F1 0.27. This supersedes an earlier, worse
+  baseline (`rf`: same `class_weight`, unregularized, trained with
+  `survey_year` included — ROC-AUC 0.750, recall 0.58) — kept in the
+  notebook as part of the investigation trail below, not the model to
+  build on.
+
+  **How we got here** (each step is its own titled section in the
+  notebook, in order):
+  1. Fit `rf` on `X_train`/`X_test`/`y_train`/`y_test` (144 columns,
+     one-hot `crop_name`/`region_code`/`survey_year`) as the first
+     baseline — ROC-AUC 0.750.
+  2. Two feature-importance methods disagreed sharply: scikit-learn's
+     default MDI (training-data-based) ranked `household_size` first
+     (0.30), but permutation importance (test-set-based, unbiased by
+     cardinality) dropped it to #7 and ranked `crop_name_TEFF` first
+     instead — MDI is known to inflate continuous/high-cardinality
+     features. **Permutation importance is the trustworthy one.**
+  3. Rainfall didn't crack permutation importance's top 15 at all, which
+     was surprising given the pitch leans on seasonal rainfall. Root-caused
+     via two checks: (a) rainfall is merged at region+year grain, so it's
+     100% determined by `region_code`+`survey_year` (confirmed via a
+     groupby-nunique check); (b) a `region_code`-alone redundancy check
+     showed each region's rainfall varies only ~15% as much year-to-year as
+     it varies *between* regions, so `region_code` (a genuine frontend
+     input) already absorbs most of rainfall's signal — permutation
+     importance wasn't wrong, rainfall's *marginal* contribution really is
+     small on average.
+  4. Ablation: refit without `survey_year` (which the frontend will never
+     collect — any live year is unseen by the encoder and gets zeroed out
+     by `handle_unknown="ignore"`) — performance barely moved (ROC-AUC
+     0.750 → 0.748), confirming `survey_year` wasn't doing meaningful work
+     and can be dropped for free. This produced `X_train_no_year`/
+     `X_test_no_year` (139 columns), the feature set the official baseline
+     uses.
+  5. A synthetic sensitivity scenario (hold region+crop fixed, vary Meher
+     rainfall 40%-160% of the region's long-term average) showed rainfall
+     *does* move predictions meaningfully (7.8-57 percentage points
+     depending on the scenario) — low average importance and a large local
+     effect aren't contradictory. But one scenario (Benishangul-Gumuz +
+     Teff) swung wildly and non-monotonically (0.51 → 0.02 → 0.35),
+     suggesting overfitting to a sparse region×crop×rainfall slice, since
+     the model had no `max_depth`/`min_samples_leaf` constraint.
+  6. Regularizing with `min_samples_leaf=10` confirmed the overfitting
+     diagnosis: ROC-AUC rose to 0.808, recall rose to 0.73, and the wild
+     swing smoothed into the 0.56-0.72 range with a plausible shape
+     (elevated at both drought and flood extremes) — this became
+     `rf_regularized`, the official baseline above.
+
+  A colleague is adding an XGBoost model — **compare it against
+  `rf_regularized`/`X_train_no_year`/`X_test_no_year`, not the original
+  `rf`** — and use XGBoost's permutation importance (or SHAP) rather than
+  its default `gain`/`weight` importance for a fair comparison.
   **Not yet done**: no threshold tuning or alternative imbalance strategy
-  (e.g. SMOTE) tried yet to improve precision; no model comparison/selection
-  step once XGBoost is added; the rainfall-features-low-importance finding
-  above hasn't been investigated further.
+  (e.g. SMOTE) tried; no model comparison/selection step once XGBoost is
+  added; no sample-size check for the thinner region×crop combinations
+  (`min_samples_leaf=10` was a blunt fix, not a targeted one).
 - `data/raw/` — gitignored, not tracked. Contains one folder per LSMS wave
   (`ETH_2011_ERSS_v02_M_CSV`, `ETH_2013_ESS_v03_M_SPSS`,
   `ETH_2015_ESS_v03_M_CSV`, `ETH_2018_ESS_v04_M_CSV`,
