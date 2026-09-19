@@ -1,0 +1,609 @@
+region_code,region_name,crop_name,rows,loss_rate,limited_data
+1,Tigray,APPLES,2,0.0,True
+1,Tigray,AVOCADOS,4,0.0,True
+1,Tigray,BANANAS,13,0.0,True
+1,Tigray,BARLEY,443,0.1558,False
+1,Tigray,BEER ROOT,2,0.0,True
+1,Tigray,CABBAGE,4,0.0,True
+1,Tigray,CACTUS,40,0.0,False
+1,Tigray,CARROT,1,0.0,True
+1,Tigray,CHAT,9,0.3333,True
+1,Tigray,CHICK PEAS,83,0.0602,False
+1,Tigray,CINNAMON,1,0.0,True
+1,Tigray,CITRON,6,0.0,True
+1,Tigray,COFFEE,16,0.125,True
+1,Tigray,CORIANDER,2,0.0,True
+1,Tigray,COTTON,4,0.0,True
+1,Tigray,FENUGREEK,28,0.0,True
+1,Tigray,FIELD PEAS,90,0.0222,False
+1,Tigray,GARLIC,52,0.0192,False
+1,Tigray,GESHO,146,0.0205,False
+1,Tigray,GRAZING LAND,2,0.0,True
+1,Tigray,GREEN PEPPER,19,0.0526,True
+1,Tigray,GROUND NUTS,4,0.0,True
+1,Tigray,GUAVA,38,0.0,False
+1,Tigray,HARICOT BEANS,22,0.0455,True
+1,Tigray,HORSE BEANS,261,0.023,False
+1,Tigray,KALE,1,0.0,True
+1,Tigray,KAZMIR,5,0.2,True
+1,Tigray,LEMONS,25,0.0,True
+1,Tigray,LENTILS,94,0.0213,False
+1,Tigray,LETTUCE,9,0.0,True
+1,Tigray,LINESEED,92,0.0109,False
+1,Tigray,MAIZE,751,0.0346,False
+1,Tigray,MANGOS,19,0.1053,True
+1,Tigray,MILLET,361,0.1496,False
+1,Tigray,MUNG BEAN,1,1.0,True
+1,Tigray,NUEG,52,0.0192,False
+1,Tigray,ONION,21,0.0,True
+1,Tigray,ORANGES,9,0.0,True
+1,Tigray,OTHER CEREAL,26,0.1154,True
+1,Tigray,OTHER FRUITS,73,0.0,False
+1,Tigray,OTHER LAND USE,1,0.0,True
+1,Tigray,OTHER SPICES,12,0.0,True
+1,Tigray,PAPAYA,21,0.0,True
+1,Tigray,PEACH,3,0.0,True
+1,Tigray,POTATOES,11,0.0909,True
+1,Tigray,PUMPKINS,2,0.0,True
+1,Tigray,RAPE SEED,3,0.0,True
+1,Tigray,RED KIDENY BEANS,22,0.0,True
+1,Tigray,RED PEPPER,171,0.0,False
+1,Tigray,RICE,12,0.3333,True
+1,Tigray,ROMAN,1,0.0,True
+1,Tigray,RUE,1,0.0,True
+1,Tigray,SACRED BASIL,6,0.0,True
+1,Tigray,SESAME,208,0.399,False
+1,Tigray,SORGHUM,553,0.2206,False
+1,Tigray,SOYA BEANS,1,0.0,True
+1,Tigray,SPINACH,7,0.0,True
+1,Tigray,SUGAR CANE,1,0.0,True
+1,Tigray,SUNFLOWER,9,0.0,True
+1,Tigray,SWEET POTATO,1,0.0,True
+1,Tigray,TEFF,567,0.1587,False
+1,Tigray,TOMATOES,12,0.0,True
+1,Tigray,UNKNOWN,225,0.0,False
+1,Tigray,VETCH,55,0.1455,False
+1,Tigray,WHEAT,436,0.1858,False
+2,Afar,BANANAS,3,0.0,True
+2,Afar,BARLEY,7,0.0,True
+2,Afar,CABBAGE,1,0.0,True
+2,Afar,COTTON,3,1.0,True
+2,Afar,GREEN PEPPER,5,0.2,True
+2,Afar,HORSE BEANS,1,1.0,True
+2,Afar,KALE,1,0.0,True
+2,Afar,LEMONS,4,0.0,True
+2,Afar,MAIZE,63,0.1587,False
+2,Afar,MANGOS,2,0.0,True
+2,Afar,MUNG BEAN,8,0.125,True
+2,Afar,ONION,2,0.5,True
+2,Afar,OTHER FRUITS,22,0.0909,True
+2,Afar,PAPAYA,2,0.0,True
+2,Afar,RED KIDENY BEANS,2,0.0,True
+2,Afar,RED PEPPER,7,0.0,True
+2,Afar,SORGHUM,39,0.2821,False
+2,Afar,TEFF,15,0.0667,True
+2,Afar,TOMATOES,11,0.6364,True
+2,Afar,UNKNOWN,80,0.0,False
+3,Amhara,APPLES,15,0.0,True
+3,Amhara,AVOCADOS,16,0.0,True
+3,Amhara,BANANAS,114,0.0,False
+3,Amhara,BARLEY,852,0.0411,False
+3,Amhara,BEER ROOT,26,0.0,True
+3,Amhara,BLACK CUMIN,22,0.0,True
+3,Amhara,CABBAGE,42,0.0,False
+3,Amhara,CACTUS,25,0.0,True
+3,Amhara,CARROT,22,0.0,True
+3,Amhara,CAULIFLOWER,1,0.0,True
+3,Amhara,CHAT,140,0.0214,False
+3,Amhara,CHICK PEAS,267,0.0449,False
+3,Amhara,CHILIES,17,0.0,True
+3,Amhara,CINNAMON,1,0.0,True
+3,Amhara,CITRON,10,0.0,True
+3,Amhara,COFFEE,271,0.0,False
+3,Amhara,CORIANDER,55,0.0,False
+3,Amhara,COTTON,34,0.0294,False
+3,Amhara,COTTON SEED,1,0.0,True
+3,Amhara,ENSET,1,0.0,True
+3,Amhara,FENUGREEK,168,0.006,False
+3,Amhara,FIELD PEAS,351,0.0142,False
+3,Amhara,GARLIC,475,0.0,False
+3,Amhara,GESHO,755,0.0026,False
+3,Amhara,GIBTO,71,0.0,False
+3,Amhara,GISHITA,1,0.0,True
+3,Amhara,GREEN PEPPER,110,0.0,False
+3,Amhara,GROUND NUTS,28,0.0714,True
+3,Amhara,GUAVA,57,0.0,False
+3,Amhara,HARICOT BEANS,193,0.0,False
+3,Amhara,HORSE BEANS,701,0.0143,False
+3,Amhara,KALE,120,0.0,False
+3,Amhara,KAZMIR,3,0.0,True
+3,Amhara,LEMONS,57,0.0,False
+3,Amhara,LENTILS,215,0.0326,False
+3,Amhara,LETTUCE,5,0.0,True
+3,Amhara,LINESEED,271,0.0037,False
+3,Amhara,MAIZE,1690,0.0337,False
+3,Amhara,MANDARINS,4,0.0,True
+3,Amhara,MANGOS,80,0.0,False
+3,Amhara,MILLET,501,0.1198,False
+3,Amhara,MUNG BEAN,62,0.0,False
+3,Amhara,NUEG,305,0.0361,False
+3,Amhara,OATS,39,0.0513,False
+3,Amhara,ONION,128,0.0234,False
+3,Amhara,ORANGES,73,0.0,False
+3,Amhara,OTHER CEREAL,9,0.0,True
+3,Amhara,OTHER FRUITS,10,0.0,True
+3,Amhara,OTHER LAND USE,9,0.0,True
+3,Amhara,OTHER PULSES,9,0.0,True
+3,Amhara,OTHER SPICES,145,0.0,False
+3,Amhara,OTHER VEGETABLE,3,0.0,True
+3,Amhara,PAPAYA,46,0.0,False
+3,Amhara,PEACH,14,0.0,True
+3,Amhara,PINAPPLES,1,0.0,True
+3,Amhara,POTATOES,293,0.0171,False
+3,Amhara,PUMPKINS,138,0.0,False
+3,Amhara,RAPE SEED,253,0.0079,False
+3,Amhara,RED KIDENY BEANS,40,0.025,False
+3,Amhara,RED PEPPER,565,0.0283,False
+3,Amhara,RICE,82,0.2561,False
+3,Amhara,ROMAN,12,0.0833,True
+3,Amhara,RUE,84,0.0,False
+3,Amhara,SACRED BASIL,67,0.0,False
+3,Amhara,SESAME,190,0.1316,False
+3,Amhara,SORGHUM,876,0.0811,False
+3,Amhara,SOYA BEANS,20,0.35,True
+3,Amhara,SPINACH,21,0.0,True
+3,Amhara,SUGAR CANE,38,0.0,False
+3,Amhara,SUNFLOWER,105,0.019,False
+3,Amhara,SWEET POTATO,26,0.0,True
+3,Amhara,TEFF,1362,0.1564,False
+3,Amhara,TEMPORARY GR,1,0.0,True
+3,Amhara,TOBACCO,30,0.0,False
+3,Amhara,TOMATOES,49,0.0204,False
+3,Amhara,UNKNOWN,357,0.0,False
+3,Amhara,VETCH,243,0.0494,False
+3,Amhara,WATERMELON,1,0.0,True
+3,Amhara,WHEAT,922,0.0922,False
+3,Amhara,WHITE CUMIN,17,0.0,True
+4,Oromia,APPLES,4,0.0,True
+4,Oromia,AVOCADOS,276,0.0109,False
+4,Oromia,BANANAS,459,0.0131,False
+4,Oromia,BARLEY,674,0.1083,False
+4,Oromia,BEER ROOT,120,0.0083,False
+4,Oromia,BLACK CUMIN,9,0.0,True
+4,Oromia,CABBAGE,137,0.0,False
+4,Oromia,CACTUS,54,0.0,False
+4,Oromia,CARDAMON,8,0.0,True
+4,Oromia,CARROT,39,0.0256,False
+4,Oromia,CAULIFLOWER,8,0.0,True
+4,Oromia,CHAT,645,0.0372,False
+4,Oromia,CHICK PEAS,183,0.1475,False
+4,Oromia,CHILIES,3,0.0,True
+4,Oromia,CINNAMON,1,0.0,True
+4,Oromia,CITRON,11,0.0,True
+4,Oromia,COFFEE,863,0.1784,False
+4,Oromia,CORIANDER,34,0.0,False
+4,Oromia,COTTON,6,0.0,True
+4,Oromia,COTTON SEED,1,0.0,True
+4,Oromia,ENSET,659,0.0774,False
+4,Oromia,FENNEL,2,0.0,True
+4,Oromia,FENUGREEK,168,0.0179,False
+4,Oromia,FIELD PEAS,300,0.0633,False
+4,Oromia,GARLIC,383,0.0052,False
+4,Oromia,GESHO,298,0.0034,False
+4,Oromia,GINGER,67,0.0,False
+4,Oromia,GISHITA,27,0.0,True
+4,Oromia,GODERE,231,0.0087,False
+4,Oromia,GRAZING LAND,2,0.5,True
+4,Oromia,GREEN PEPPER,382,0.0026,False
+4,Oromia,GROUND NUTS,48,0.0417,False
+4,Oromia,GUAVA,51,0.0196,False
+4,Oromia,HARICOT BEANS,389,0.0283,False
+4,Oromia,HORSE BEANS,640,0.0359,False
+4,Oromia,KALE,486,0.0062,False
+4,Oromia,KAZMIR,12,0.0,True
+4,Oromia,LEMONS,17,0.0,True
+4,Oromia,LENTILS,132,0.0833,False
+4,Oromia,LETTUCE,13,0.0,True
+4,Oromia,LINESEED,118,0.0508,False
+4,Oromia,MAIZE,1671,0.0844,False
+4,Oromia,MANDARINS,3,0.0,True
+4,Oromia,MANGOS,254,0.0039,False
+4,Oromia,MILLET,190,0.1211,False
+4,Oromia,MUNG BEAN,7,0.4286,True
+4,Oromia,MUSTARD,1,0.0,True
+4,Oromia,NUEG,247,0.1336,False
+4,Oromia,OATS,62,0.0323,False
+4,Oromia,ONION,120,0.1417,False
+4,Oromia,ORANGES,98,0.0408,False
+4,Oromia,OTHER CASH CROPS,10,0.0,True
+4,Oromia,OTHER CEREAL,1,0.0,True
+4,Oromia,OTHER FRUITS,36,0.0,False
+4,Oromia,OTHER LAND USE,19,0.0,True
+4,Oromia,OTHER OIL SEED,12,0.0,True
+4,Oromia,OTHER PULSES,28,0.0357,True
+4,Oromia,OTHER ROOT CROPS,194,0.0052,False
+4,Oromia,OTHER SPICES,60,0.0,False
+4,Oromia,OTHER VEGETABLE,32,0.0,False
+4,Oromia,OTHERS,3,0.0,True
+4,Oromia,PAPAYA,123,0.0407,False
+4,Oromia,PEACH,43,0.0,False
+4,Oromia,PINAPPLES,19,0.0,True
+4,Oromia,POTATOES,125,0.024,False
+4,Oromia,PUMPKINS,289,0.0138,False
+4,Oromia,RAPE SEED,270,0.0,False
+4,Oromia,RED KIDENY BEANS,163,0.0429,False
+4,Oromia,RED PEPPER,240,0.1,False
+4,Oromia,RICE,4,0.0,True
+4,Oromia,ROMAN,1,0.0,True
+4,Oromia,RUE,84,0.0,False
+4,Oromia,SACRED BASIL,36,0.0,False
+4,Oromia,SESAME,74,0.1216,False
+4,Oromia,SORGHUM,757,0.0964,False
+4,Oromia,SOYA BEANS,6,0.0,True
+4,Oromia,SPINACH,35,0.0,False
+4,Oromia,SUGAR CANE,151,0.0132,False
+4,Oromia,SUNFLOWER,12,0.0,True
+4,Oromia,SWEET POTATO,221,0.0045,False
+4,Oromia,TEFF,1126,0.3126,False
+4,Oromia,TEMPORARY GR,1,0.0,True
+4,Oromia,TOBACCO,50,0.0,False
+4,Oromia,TOMATOES,46,0.0217,False
+4,Oromia,TUMERIC,8,0.0,True
+4,Oromia,UNKNOWN,396,0.0,False
+4,Oromia,VETCH,123,0.0488,False
+4,Oromia,WHEAT,819,0.2601,False
+4,Oromia,WHITE CUMIN,3,0.0,True
+5,Somali,AMBOSHIKA,3,0.0,True
+5,Somali,BANANAS,9,0.0,True
+5,Somali,BARLEY,1,0.0,True
+5,Somali,BLACK PEPPER,1,0.0,True
+5,Somali,CACTUS,1,0.0,True
+5,Somali,CHAT,100,0.0,False
+5,Somali,CHICK PEAS,1,0.0,True
+5,Somali,COFFEE,8,0.0,True
+5,Somali,COMTATIE,2,0.0,True
+5,Somali,FIELD PEAS,2,0.0,True
+5,Somali,GARLIC,1,0.0,True
+5,Somali,GISHITA,1,0.0,True
+5,Somali,GREEN PEPPER,15,0.0,True
+5,Somali,GROUND NUTS,31,0.0323,False
+5,Somali,GUAVA,12,0.0,True
+5,Somali,HARICOT BEANS,28,0.0,True
+5,Somali,LEMONS,21,0.0,True
+5,Somali,MAIZE,281,0.0391,False
+5,Somali,MANGOS,26,0.0385,True
+5,Somali,ONION,13,0.3077,True
+5,Somali,ORANGES,23,0.0,True
+5,Somali,OTHER FRUITS,17,0.0,True
+5,Somali,PAPAYA,4,0.0,True
+5,Somali,POTATOES,1,0.0,True
+5,Somali,PUMPKINS,12,0.0,True
+5,Somali,RED KIDENY BEANS,15,0.0,True
+5,Somali,RED PEPPER,2,0.0,True
+5,Somali,SESAME,2,0.0,True
+5,Somali,SORGHUM,268,0.0522,False
+5,Somali,SPINACH,1,0.0,True
+5,Somali,SWEET POTATO,10,0.0,True
+5,Somali,TOBACCO,2,0.0,True
+5,Somali,TOMATOES,33,0.0606,False
+5,Somali,UNKNOWN,205,0.0,False
+5,Somali,WATERMELON,1,0.0,True
+5,Somali,WHEAT,13,0.0769,True
+6,Benishangul-Gumuz,AVOCADOS,25,0.0,True
+6,Benishangul-Gumuz,BANANAS,163,0.0184,False
+6,Benishangul-Gumuz,BARLEY,14,0.0,True
+6,Benishangul-Gumuz,BEER ROOT,5,0.0,True
+6,Benishangul-Gumuz,BLACK CUMIN,3,0.0,True
+6,Benishangul-Gumuz,CABBAGE,16,0.0,True
+6,Benishangul-Gumuz,CACTUS,16,0.0,True
+6,Benishangul-Gumuz,CARDAMON,1,0.0,True
+6,Benishangul-Gumuz,CARROT,5,0.0,True
+6,Benishangul-Gumuz,CASSAVA,3,0.0,True
+6,Benishangul-Gumuz,CHAT,124,0.0161,False
+6,Benishangul-Gumuz,CHICK PEAS,41,0.0244,False
+6,Benishangul-Gumuz,CHILIES,25,0.0,True
+6,Benishangul-Gumuz,CINNAMON,1,0.0,True
+6,Benishangul-Gumuz,CITRON,3,0.0,True
+6,Benishangul-Gumuz,COFFEE,122,0.0,False
+6,Benishangul-Gumuz,CORIANDER,8,0.0,True
+6,Benishangul-Gumuz,ENSET,6,0.0,True
+6,Benishangul-Gumuz,FENNEL,2,0.0,True
+6,Benishangul-Gumuz,FENUGREEK,4,0.0,True
+6,Benishangul-Gumuz,FIELD PEAS,5,0.0,True
+6,Benishangul-Gumuz,GARLIC,11,0.0,True
+6,Benishangul-Gumuz,GESHO,30,0.0,False
+6,Benishangul-Gumuz,GINGER,8,0.0,True
+6,Benishangul-Gumuz,GODERE,17,0.0,True
+6,Benishangul-Gumuz,GREEN PEPPER,9,0.0,True
+6,Benishangul-Gumuz,GROUND NUTS,145,0.1931,False
+6,Benishangul-Gumuz,GUAVA,53,0.0,False
+6,Benishangul-Gumuz,HARICOT BEANS,84,0.0595,False
+6,Benishangul-Gumuz,HORSE BEANS,9,0.1111,True
+6,Benishangul-Gumuz,KALE,50,0.0,False
+6,Benishangul-Gumuz,KAZMIR,23,0.0,True
+6,Benishangul-Gumuz,LEMONS,28,0.0,True
+6,Benishangul-Gumuz,LETTUCE,3,0.0,True
+6,Benishangul-Gumuz,LINESEED,59,0.0169,False
+6,Benishangul-Gumuz,MAIZE,541,0.0832,False
+6,Benishangul-Gumuz,MANGOS,245,0.0,False
+6,Benishangul-Gumuz,MILLET,157,0.2357,False
+6,Benishangul-Gumuz,MUNG BEAN,4,0.0,True
+6,Benishangul-Gumuz,NUEG,113,0.0708,False
+6,Benishangul-Gumuz,ONION,12,0.0,True
+6,Benishangul-Gumuz,ORANGES,67,0.0149,False
+6,Benishangul-Gumuz,OTHER CEREAL,3,0.0,True
+6,Benishangul-Gumuz,OTHER FRUITS,6,0.0,True
+6,Benishangul-Gumuz,OTHER LAND USE,1,0.0,True
+6,Benishangul-Gumuz,OTHER OIL SEED,3,0.0,True
+6,Benishangul-Gumuz,OTHER PULSES,15,0.0,True
+6,Benishangul-Gumuz,OTHER ROOT CROPS,32,0.0,False
+6,Benishangul-Gumuz,OTHER SPICES,7,0.0,True
+6,Benishangul-Gumuz,OTHER VEGETABLE,83,0.0241,False
+6,Benishangul-Gumuz,PAPAYA,102,0.0,False
+6,Benishangul-Gumuz,PEACH,5,0.0,True
+6,Benishangul-Gumuz,PINAPPLES,3,0.0,True
+6,Benishangul-Gumuz,POTATOES,17,0.0588,True
+6,Benishangul-Gumuz,PUMPKINS,158,0.0063,False
+6,Benishangul-Gumuz,RAPE SEED,7,0.1429,True
+6,Benishangul-Gumuz,RED KIDENY BEANS,69,0.0145,False
+6,Benishangul-Gumuz,RED PEPPER,175,0.04,False
+6,Benishangul-Gumuz,RICE,25,0.2,True
+6,Benishangul-Gumuz,ROMAN,1,0.0,True
+6,Benishangul-Gumuz,RUE,7,0.0,True
+6,Benishangul-Gumuz,SACRED BASIL,12,0.0,True
+6,Benishangul-Gumuz,SESAME,164,0.2378,False
+6,Benishangul-Gumuz,SHIFERAW,3,0.0,True
+6,Benishangul-Gumuz,SORGHUM,321,0.1371,False
+6,Benishangul-Gumuz,SOYA BEANS,141,0.2128,False
+6,Benishangul-Gumuz,SUGAR CANE,16,0.0,True
+6,Benishangul-Gumuz,SUNFLOWER,5,0.2,True
+6,Benishangul-Gumuz,SWEET POTATO,130,0.0077,False
+6,Benishangul-Gumuz,TEFF,147,0.1973,False
+6,Benishangul-Gumuz,TOBACCO,1,0.0,True
+6,Benishangul-Gumuz,TOMATOES,18,0.0,True
+6,Benishangul-Gumuz,TUMERIC,2,0.0,True
+6,Benishangul-Gumuz,UNKNOWN,14,0.0,True
+6,Benishangul-Gumuz,WEPAL,1,0.0,True
+6,Benishangul-Gumuz,WHEAT,14,0.0,True
+7,SNNPR,APPLES,25,0.04,True
+7,SNNPR,AVOCADOS,839,0.0119,False
+7,SNNPR,BANANAS,1188,0.0109,False
+7,SNNPR,BARLEY,688,0.1294,False
+7,SNNPR,BEER ROOT,82,0.0244,False
+7,SNNPR,BLACK CUMIN,2,0.0,True
+7,SNNPR,BLACK PEPPER,5,0.2,True
+7,SNNPR,BOYE/YAM,18,0.1111,True
+7,SNNPR,CABBAGE,61,0.0328,False
+7,SNNPR,CACTUS,183,0.0,False
+7,SNNPR,CARDAMON,165,0.0121,False
+7,SNNPR,CARROT,28,0.0357,True
+7,SNNPR,CASSAVA,252,0.0,False
+7,SNNPR,CAULIFLOWER,33,0.0,False
+7,SNNPR,CHAT,579,0.1105,False
+7,SNNPR,CHICK PEAS,30,0.0667,False
+7,SNNPR,CHILIES,66,0.0152,False
+7,SNNPR,CITRON,1,0.0,True
+7,SNNPR,COFFEE,2050,0.0873,False
+7,SNNPR,CORIANDER,26,0.0,True
+7,SNNPR,COTTON,29,0.0,True
+7,SNNPR,COTTON SEED,1,0.0,True
+7,SNNPR,ENSET,2617,0.0844,False
+7,SNNPR,FENNEL,7,0.4286,True
+7,SNNPR,FENUGREEK,51,0.0588,False
+7,SNNPR,FIELD PEAS,448,0.0558,False
+7,SNNPR,GARLIC,166,0.0663,False
+7,SNNPR,GESHO,275,0.0182,False
+7,SNNPR,GIBTO,2,0.0,True
+7,SNNPR,GINGER,64,0.0312,False
+7,SNNPR,GISHITA,42,0.0,False
+7,SNNPR,GODERE,1227,0.0196,False
+7,SNNPR,GRAZING LAND,1,0.0,True
+7,SNNPR,GREEN PEPPER,185,0.0054,False
+7,SNNPR,GROUND NUTS,18,0.1111,True
+7,SNNPR,GUAVA,61,0.0,False
+7,SNNPR,HARICOT BEANS,605,0.0331,False
+7,SNNPR,HORSE BEANS,761,0.0499,False
+7,SNNPR,KALE,1572,0.0127,False
+7,SNNPR,KAZMIR,45,0.0222,False
+7,SNNPR,LEMONS,60,0.0167,False
+7,SNNPR,LENTILS,24,0.125,True
+7,SNNPR,LETTUCE,4,0.0,True
+7,SNNPR,LINESEED,33,0.0,False
+7,SNNPR,MAIZE,1598,0.1145,False
+7,SNNPR,MANDARINS,1,0.0,True
+7,SNNPR,MANGOS,434,0.0023,False
+7,SNNPR,MILLET,74,0.0811,False
+7,SNNPR,MUNG BEAN,13,0.0769,True
+7,SNNPR,OATS,2,0.0,True
+7,SNNPR,ONION,150,0.0067,False
+7,SNNPR,ORANGES,130,0.0308,False
+7,SNNPR,OTHER CEREAL,3,0.0,True
+7,SNNPR,OTHER FRUITS,214,0.0047,False
+7,SNNPR,OTHER LAND USE,2,0.0,True
+7,SNNPR,OTHER OIL SEED,4,0.0,True
+7,SNNPR,OTHER PULSES,29,0.0,True
+7,SNNPR,OTHER ROOT CROPS,419,0.0072,False
+7,SNNPR,OTHER SPICES,80,0.0,False
+7,SNNPR,OTHER VEGETABLE,69,0.0,False
+7,SNNPR,PAPAYA,264,0.0114,False
+7,SNNPR,PEACH,46,0.0435,False
+7,SNNPR,PINAPPLES,18,0.0,True
+7,SNNPR,POTATOES,278,0.0288,False
+7,SNNPR,PUMPKINS,526,0.0019,False
+7,SNNPR,RAPE SEED,45,0.0222,False
+7,SNNPR,RED KIDENY BEANS,495,0.0465,False
+7,SNNPR,RED PEPPER,165,0.0606,False
+7,SNNPR,RICE,15,0.0,True
+7,SNNPR,RUE,175,0.0057,False
+7,SNNPR,SACRED BASIL,42,0.0,False
+7,SNNPR,SAVORY,1,0.0,True
+7,SNNPR,SESAME,13,0.0,True
+7,SNNPR,SHIFERAW,39,0.0,False
+7,SNNPR,SORGHUM,980,0.0704,False
+7,SNNPR,SOYA BEANS,10,0.0,True
+7,SNNPR,SPINACH,12,0.0,True
+7,SNNPR,STRAWBERRY,1,0.0,True
+7,SNNPR,SUGAR CANE,562,0.0089,False
+7,SNNPR,SUNFLOWER,8,0.0,True
+7,SNNPR,SWEET POTATO,596,0.0252,False
+7,SNNPR,TEFF,1117,0.2337,False
+7,SNNPR,TIMIZ KIMEM,3,0.0,True
+7,SNNPR,TOBACCO,71,0.0,False
+7,SNNPR,TOMATOES,45,0.0,False
+7,SNNPR,TUMERIC,35,0.0286,False
+7,SNNPR,UNKNOWN,444,0.0,False
+7,SNNPR,VETCH,2,0.5,True
+7,SNNPR,WHEAT,622,0.246,False
+7,SNNPR,WHITE CUMIN,2,0.0,True
+12,Gambela,AVOCADOS,126,0.0317,False
+12,Gambela,BANANAS,164,0.0061,False
+12,Gambela,BARLEY,1,0.0,True
+12,Gambela,CABBAGE,1,0.0,True
+12,Gambela,CARDAMON,3,0.0,True
+12,Gambela,CASSAVA,21,0.0,True
+12,Gambela,CAULIFLOWER,5,0.0,True
+12,Gambela,CHAT,44,0.1364,False
+12,Gambela,CHILIES,18,0.0,True
+12,Gambela,COFFEE,207,0.3043,False
+12,Gambela,CORIANDER,2,0.0,True
+12,Gambela,COTTON SEED,1,0.0,True
+12,Gambela,ENSET,149,0.0201,False
+12,Gambela,FENNEL,1,0.0,True
+12,Gambela,FIELD PEAS,1,0.0,True
+12,Gambela,GESHO,41,0.0,False
+12,Gambela,GINGER,12,0.0,True
+12,Gambela,GODERE,81,0.0,False
+12,Gambela,GREEN PEPPER,23,0.0435,True
+12,Gambela,GROUND NUTS,4,0.0,True
+12,Gambela,GUAVA,7,0.0,True
+12,Gambela,HARICOT BEANS,19,0.0,True
+12,Gambela,HORSE BEANS,2,0.0,True
+12,Gambela,KALE,81,0.0,False
+12,Gambela,LEMONS,9,0.0,True
+12,Gambela,LINESEED,2,0.0,True
+12,Gambela,MAIZE,303,0.0495,False
+12,Gambela,MANDARINS,1,0.0,True
+12,Gambela,MANGOS,144,0.0069,False
+12,Gambela,NUEG,1,0.0,True
+12,Gambela,ONION,1,0.0,True
+12,Gambela,ORANGES,34,0.0,False
+12,Gambela,OTHER CEREAL,1,0.0,True
+12,Gambela,OTHER FRUITS,4,0.0,True
+12,Gambela,OTHER LAND USE,1,0.0,True
+12,Gambela,OTHER ROOT CROPS,23,0.0,True
+12,Gambela,OTHER SPICES,14,0.0,True
+12,Gambela,OTHER VEGETABLE,43,0.0,False
+12,Gambela,OTHERS,1,0.0,True
+12,Gambela,PAPAYA,128,0.0,False
+12,Gambela,PEACH,1,0.0,True
+12,Gambela,PINAPPLES,6,0.0,True
+12,Gambela,POTATOES,1,0.0,True
+12,Gambela,PUMPKINS,43,0.0,False
+12,Gambela,RAPE SEED,1,0.0,True
+12,Gambela,RED KIDENY BEANS,9,0.0,True
+12,Gambela,RED PEPPER,19,0.0,True
+12,Gambela,RICE,7,0.0,True
+12,Gambela,RUE,26,0.0,True
+12,Gambela,SACRED BASIL,8,0.0,True
+12,Gambela,SESAME,1,0.0,True
+12,Gambela,SORGHUM,175,0.0286,False
+12,Gambela,SUGAR CANE,97,0.0,False
+12,Gambela,SUNFLOWER,1,0.0,True
+12,Gambela,SWEET POTATO,23,0.0,True
+12,Gambela,TEFF,3,0.0,True
+12,Gambela,TOBACCO,23,0.0,True
+12,Gambela,TOMATOES,5,0.0,True
+12,Gambela,TUMERIC,21,0.2857,True
+12,Gambela,UNKNOWN,71,0.0,False
+12,Gambela,WHEAT,1,0.0,True
+13,Harari,AMBOSHIKA,2,0.0,True
+13,Harari,AVOCADOS,7,0.0,True
+13,Harari,BANANAS,94,0.0213,False
+13,Harari,BARLEY,6,0.0,True
+13,Harari,BEER ROOT,2,0.0,True
+13,Harari,CABBAGE,5,0.0,True
+13,Harari,CHAT,577,0.0936,False
+13,Harari,CHICK PEAS,3,0.0,True
+13,Harari,CHILIES,5,0.0,True
+13,Harari,COFFEE,66,0.0606,False
+13,Harari,ENSET,1,0.0,True
+13,Harari,FENUGREEK,1,0.0,True
+13,Harari,FIELD PEAS,2,0.0,True
+13,Harari,GARLIC,1,0.0,True
+13,Harari,GESHO,1,0.0,True
+13,Harari,GISHITA,26,0.0,True
+13,Harari,GREEN PEPPER,1,0.0,True
+13,Harari,GROUND NUTS,222,0.1306,False
+13,Harari,GUAVA,76,0.0395,False
+13,Harari,HARICOT BEANS,6,0.0,True
+13,Harari,HORSE BEANS,2,0.0,True
+13,Harari,KALE,3,0.0,True
+13,Harari,KAZMIR,20,0.15,True
+13,Harari,LEMONS,69,0.0,False
+13,Harari,LENTILS,3,0.0,True
+13,Harari,MAIZE,437,0.135,False
+13,Harari,MANDARINS,1,0.0,True
+13,Harari,MANGOS,239,0.0209,False
+13,Harari,ONION,3,0.0,True
+13,Harari,ORANGES,2,0.0,True
+13,Harari,OTHER FRUITS,34,0.0294,False
+13,Harari,OTHER SPICES,1,0.0,True
+13,Harari,PAPAYA,70,0.0429,False
+13,Harari,POTATOES,5,0.0,True
+13,Harari,PUMPKINS,118,0.0593,False
+13,Harari,RAPE SEED,2,0.0,True
+13,Harari,RED KIDENY BEANS,4,0.25,True
+13,Harari,RED PEPPER,1,0.0,True
+13,Harari,SESAME,5,0.0,True
+13,Harari,SHIFERAW,1,0.0,True
+13,Harari,SORGHUM,525,0.1867,False
+13,Harari,STRAWBERRY,1,0.0,True
+13,Harari,SUGAR CANE,42,0.0238,False
+13,Harari,SWEET POTATO,84,0.0595,False
+13,Harari,TEFF,1,0.0,True
+13,Harari,TIMIZ KIMEM,1,0.0,True
+13,Harari,TOMATOES,14,0.0714,True
+13,Harari,UNKNOWN,18,0.0,True
+13,Harari,WATERMELON,2,0.0,True
+13,Harari,WHEAT,19,0.1579,True
+15,Dire Dawa,AMBOSHIKA,1,0.0,True
+15,Dire Dawa,BANANAS,16,0.0,True
+15,Dire Dawa,BARLEY,11,0.0,True
+15,Dire Dawa,CACTUS,8,0.0,True
+15,Dire Dawa,CHAT,222,0.0225,False
+15,Dire Dawa,CHILIES,1,0.0,True
+15,Dire Dawa,COFFEE,102,0.0,False
+15,Dire Dawa,COMTATIE,1,0.0,True
+15,Dire Dawa,FIELD PEAS,1,0.0,True
+15,Dire Dawa,GARLIC,1,0.0,True
+15,Dire Dawa,GISHITA,4,0.0,True
+15,Dire Dawa,GREEN PEPPER,8,0.0,True
+15,Dire Dawa,GROUND NUTS,33,0.0,False
+15,Dire Dawa,GUAVA,35,0.0,False
+15,Dire Dawa,HARICOT BEANS,111,0.0,False
+15,Dire Dawa,KALE,1,0.0,True
+15,Dire Dawa,KAZMIR,7,0.0,True
+15,Dire Dawa,LEMONS,15,0.0,True
+15,Dire Dawa,LINESEED,2,0.0,True
+15,Dire Dawa,MAIZE,159,0.0063,False
+15,Dire Dawa,MANDARINS,14,0.0,True
+15,Dire Dawa,MANGOS,35,0.0,False
+15,Dire Dawa,ONION,47,0.0,False
+15,Dire Dawa,ORANGES,7,0.0,True
+15,Dire Dawa,OTHER FRUITS,33,0.0,False
+15,Dire Dawa,OTHER LAND USE,1,0.0,True
+15,Dire Dawa,OTHER ROOT CROPS,1,0.0,True
+15,Dire Dawa,PAPAYA,29,0.0,True
+15,Dire Dawa,PEACH,4,0.0,True
+15,Dire Dawa,POTATOES,11,0.0,True
+15,Dire Dawa,PUMPKINS,16,0.0,True
+15,Dire Dawa,RAPE SEED,1,0.0,True
+15,Dire Dawa,RED KIDENY BEANS,23,0.0,True
+15,Dire Dawa,RED PEPPER,1,0.0,True
+15,Dire Dawa,SESAME,20,0.0,True
+15,Dire Dawa,SORGHUM,482,0.0124,False
+15,Dire Dawa,SWEET POTATO,37,0.0,False
+15,Dire Dawa,TOMATOES,36,0.0,False
+15,Dire Dawa,UNKNOWN,115,0.0,False
+15,Dire Dawa,WATERMELON,1,0.0,True
+15,Dire Dawa,WHEAT,15,0.0667,True

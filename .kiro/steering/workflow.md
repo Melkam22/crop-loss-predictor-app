@@ -13,6 +13,9 @@
   pin exact versions, this pipeline has already been bitten twice by
   subtle version-dependent behavior (SPSS categorical-groupby OOM, a
   float-precision ID bug).
+- On macOS, `xgboost` needs `brew install libomp`.
+- `notebooks/04_xgboost.ipynb` takes ~30 min (Optuna tuning). Keep the
+  machine awake while it runs: a sleeping Mac pauses the kernel.
 - Re-run the pipeline notebook end to end with:
   `jupyter nbconvert --to notebook --execute --inplace notebooks/01_data_exploration.ipynb`
 
