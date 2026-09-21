@@ -23,30 +23,32 @@ project pitch/motivation.
   "Prediction task" below for the details this notebook established.
 - `notebooks/03_modeling.ipynb` — starts from `crop_loss_model_ready.csv`.
   Grouped train/test split (`GroupShuffleSplit` on `household_id`, 80/20,
-  `random_state=42` — `train_df`/`test_df`, 58,122 / 14,366 rows).
+  `random_state=42` — `train_df`/`test_df`, 56,395 / 14,168 rows).
 
   **Official baseline: `rf_regularized`** — `RandomForestClassifier`
   (`class_weight="balanced"`, `min_samples_leaf=10`, `random_state=42`)
   trained on `X_train_no_year`/`X_test_no_year` (one-hot `crop_name` +
   `region_code` only — `survey_year` deliberately excluded, see step 4
-  below — 117 columns). Test-set result: **ROC-AUC 0.810**, loss-class
-  precision 0.16 / recall 0.72 / F1 0.26. This supersedes an earlier, worse
+  below — 116 columns). Test-set result: **ROC-AUC 0.792**, loss-class
+  precision 0.14 / recall 0.70 / F1 0.24. This supersedes an earlier, worse
   baseline (`rf`: same `class_weight`, unregularized, trained with
-  `survey_year` included — ROC-AUC 0.748, recall 0.58) — kept in the
+  `survey_year` included — ROC-AUC 0.720, recall 0.54) — kept in the
   notebook as part of the investigation trail below, not the model to
-  build on. (All `03` numbers here are after `02`'s crop-name spelling
-  merge; before it, on 123 crops, the same models scored 0.808 / 0.750.)
+  build on. (Numbers above are after dropping the `crop_name = UNKNOWN`
+  rows — see "Prediction task" below. On the prior data, with `UNKNOWN`
+  still kept and after `02`'s crop-name spelling merge, the same models
+  scored 0.810 / 0.748.)
 
   **How we got here** (each step is its own titled section in the
   notebook, in order):
-  1. Fit `rf` on `X_train`/`X_test`/`y_train`/`y_test` (122 columns,
+  1. Fit `rf` on `X_train`/`X_test`/`y_train`/`y_test` (121 columns,
      one-hot `crop_name`/`region_code`/`survey_year`) as the first
-     baseline — ROC-AUC 0.748.
+     baseline — ROC-AUC 0.720.
   2. Two feature-importance methods disagreed sharply: scikit-learn's
      default MDI (training-data-based) ranked `household_size` first
-     (0.30), but permutation importance (test-set-based, unbiased by
-     cardinality) dropped it to #7 and ranked `crop_name_TEFF` first
-     instead — MDI is known to inflate continuous/high-cardinality
+     (0.31), but permutation importance (test-set-based, unbiased by
+     cardinality) dropped it out of the top 15 and ranked `crop_name_TEFF`
+     first instead — MDI is known to inflate continuous/high-cardinality
      features. **Permutation importance is the trustworthy one.**
   3. Rainfall didn't crack permutation importance's top 15 at all, which
      was surprising given the pitch leans on seasonal rainfall. Root-caused
@@ -61,69 +63,82 @@ project pitch/motivation.
   4. Ablation: refit without `survey_year` (which the frontend will never
      collect — any live year is unseen by the encoder and gets zeroed out
      by `handle_unknown="ignore"`) — performance barely moved (ROC-AUC
-     0.748 → 0.751), confirming `survey_year` wasn't doing meaningful work
+     0.720 → 0.722), confirming `survey_year` wasn't doing meaningful work
      and can be dropped for free. This produced `X_train_no_year`/
-     `X_test_no_year` (117 columns), the feature set the official baseline
+     `X_test_no_year` (116 columns), the feature set the official baseline
      uses.
   5. A synthetic sensitivity scenario (hold region+crop fixed, vary Meher
      rainfall 40%-160% of the region's long-term average) showed rainfall
-     *does* move predictions meaningfully (9-61 percentage points
+     *does* move predictions meaningfully (4-55 percentage points
      depending on the scenario) — low average importance and a large local
      effect aren't contradictory. But one scenario (Benishangul-Gumuz +
-     Teff) swung wildly and non-monotonically (0.65 → 0.04 → 0.20),
+     Teff) swung wildly and non-monotonically (0.57 → 0.02 → 0.31),
      suggesting overfitting to a sparse region×crop×rainfall slice, since
      the model had no `max_depth`/`min_samples_leaf` constraint.
   6. Regularizing with `min_samples_leaf=10` confirmed the overfitting
-     diagnosis: ROC-AUC rose to 0.810, recall rose to 0.72, and the wild
-     swing smoothed into the 0.58-0.70 range — this became
+     diagnosis: ROC-AUC rose to 0.792, recall rose to 0.70, and the wild
+     swing smoothed into roughly the 0.54-0.74 range — this became
      `rf_regularized`, the official baseline above.
 
-  `rf_regularized` is now superseded by `04_xgboost.ipynb`'s XGBoost model
-  (below). It stays the reference point every `04` comparison is made
-  against, and `04` asserts it still scores ROC-AUC 0.810.
-- `notebooks/04_xgboost.ipynb` — XGBoost vs Random Forest, tuning, and the
-  **final model choice**. Rebuilds `03`'s exact split and 117-column
-  no-`survey_year` features (asserted by row/column counts). Runs ~30 min on
-  an M2 (mostly Optuna); keep the machine awake, since a sleeping Mac pauses
-  the kernel. Ground rules: the test set is scored once (section 13), and
-  every decision is made with **grouped 5-fold CV on the training set**
+  `rf_regularized` is the reference point `04_xgboost.ipynb`'s comparison
+  is made against. `04` was re-run after the `UNKNOWN`-drop (below); see
+  that entry for current numbers.
+- `notebooks/04_xgboost.ipynb` — XGBoost vs Random Forest, tuning, and
+  (per the colleague's own sections 1-19) a final model choice — **but that
+  choice needs re-reading in light of section 20, added after the
+  `UNKNOWN`-drop re-run (below).** Rebuilds `03`'s exact split and
+  116-column no-`survey_year` features (asserted by row/column counts).
+  Runs ~30 min on an M2 (mostly Optuna); keep the machine awake, since a
+  sleeping Mac pauses the kernel. Also needs a Jupyter kernel literally
+  named `harvestguard` (`python -m ipykernel install --user --name
+  harvestguard --display-name "Python (harvestguard)"` if a fresh clone
+  doesn't have one) and `optuna`/`imbalanced-learn` actually `pip install`'d,
+  not just present in `requirements.txt` — both bit the first re-run on this
+  machine. Ground rules: the test set is scored once (section 13), and every
+  decision is made with **grouped 5-fold CV on the training set**
   (`StratifiedGroupKFold` on `household_id`, the same 5 folds reused for
   every experiment). The headline metric is **PR-AUC** (average precision),
   with ROC-AUC kept for continuity with `03`. **Decision rule used
   throughout**: extra complexity is adopted only if it wins PR-AUC in all 5
-  folds (a sign test, ~1-in-32 by chance). A first full run used a "mean
-  gain > 0.005" rule instead, which dropped `household_size` at +0.0047
-  even though XGBoost's own +0.0042 win was being accepted. That was
-  inconsistent, so it was replaced and re-run (documented in section 10).
+  folds (a sign test, ~1-in-32 by chance).
 
-  **Final model: XGBoost** (`n_estimators=121`, `learning_rate` 0.094,
-  `max_depth` 8, `gamma` 9.35, `reg_lambda` 15.6, `colsample_bytree` 0.45,
-  `scale_pos_weight` 13.95, full settings in `model/model_card.json`), on the
-  same 8 inputs as `rf_regularized`, threshold **0.498** (highest threshold
-  with ≥75% recall on out-of-fold predictions). Test: **ROC-AUC 0.814, PR-AUC
-  0.231** (baseline 0.810 / 0.223), recall 77.3% (754/976 losses) at 15.6%
-  precision (baseline at 0.5: 72.4% / 16.0%). CV PR-AUC 0.222 vs 0.212
-  baseline, 0.218 for an equally tuned RF (50 Optuna trials each). XGBoost
-  beats the tuned RF in all 5 folds and on test ROC-AUC in 100% of 1,000
-  household-bootstrap resamples; the test PR-AUC gap is within noise (82%).
-  At equal 75% recall, precision is 15.9% vs 15.7%: **a real but small
-  gain; the inputs, not the algorithm, are the ceiling.**
+  **Sections 1-19 (the colleague's original work) were written on the
+  pre-`UNKNOWN`-drop data.** The notebook was re-run end to end on the
+  corrected `crop_loss_model_ready.csv` (70,563 rows, was 72,488; 116
+  columns, was 117), so every *code* cell's output now reflects the fix,
+  but the *markdown* write-up (written before the fix) still describes the
+  old result and reads as if XGBoost clearly won — it doesn't anymore, per
+  section 20 below. Sections 1-19's markdown were deliberately left
+  unedited (it's the colleague's write-up), but should not be taken at face
+  value without reading section 20 first.
 
-  Decisions made in CV (sections 8-10): `scale_pos_weight` beat no weighting
-  and SMOTE-NC in every fold (so **scores are not probabilities**: mean score
-  0.38 vs 0.067 loss rate, and the app must show High/Low, not "x% chance");
-  grouping 25 rare crops into `OTHER (RARE)` changed nothing (crops stay
-  separate); **`household_size` stays** (helps in 5/5 folds, +0.0047 PR-AUC).
+  **Section 20 (added after the fix): XGBoost and `rf_regularized` are now
+  essentially tied.** Before the fix, XGBoost led on every metric (test
+  ROC-AUC 0.814 vs 0.810, PR-AUC 0.231 vs 0.223). After it: **ROC-AUC 0.7923
+  vs 0.7924, PR-AUC 0.2056 vs 0.2066, precision 0.1388 vs 0.1416** — XGBoost
+  is marginally *behind* on all three (well within noise), and **ahead only
+  on recall, 0.7262 vs 0.6996** (+2.7 points — catches 18 more of the 902
+  real losses at this threshold). The original "XGBoost wins, real but
+  small" conclusion was substantially an artifact of `UNKNOWN` inflating
+  both models' scores unevenly; with it gone there's no clear algorithmic
+  winner, only a modest recall argument for XGBoost. The final
+  configuration, threshold logic, and SHAP/permutation-importance findings
+  in sections 11-17 are unaffected by this and still stand on their own —
+  only the head-to-head framing in section 19 needs revising.
 
-  Other findings: rainfall alone flips High/Low for 26 of 140 common
-  region+crop combinations (19%); crop identity dominates both SHAP and
-  grouped permutation importance (~5-8× the next input). **`crop_name =
-  UNKNOWN` rows (1,925, all no-loss) are a recording artifact** that gives
-  every model easy correct answers; `04` section 13 re-scores without them
-  (`test_set_known_crops_only` in the model card). 339 of 579 region×crop
-  combinations have <30 training rows → a `limited_data` flag in
-  `model/region_crop_support.csv`.
-  **Not yet done**: probability calibration; the backend itself.
+  Other findings from the colleague's original run (mechanics unaffected by
+  the fix, exact numbers not yet re-verified post-fix): `scale_pos_weight`
+  beat no weighting and SMOTE-NC in every CV fold (so **scores are not
+  probabilities** — the app must show High/Low, not "x% chance"); grouping
+  rare crops into `OTHER (RARE)` changed nothing (crops stay separate);
+  `household_size` helps in every fold, so it stays; rainfall alone flips
+  High/Low for a meaningful minority of common region+crop combinations;
+  crop identity dominates both SHAP and permutation importance; a
+  `limited_data` flag in `model/region_crop_support.csv` marks thin
+  region×crop combinations (<30 rows).
+  **Not yet done**: probability calibration; the backend itself; a full
+  re-verification of sections 8-17's exact CV numbers post-fix (only the
+  final test-set comparison in section 20 has been directly re-checked).
 - `data/raw/` — gitignored, not tracked. Contains one folder per LSMS wave
   (`ETH_2011_ERSS_v02_M_CSV`, `ETH_2013_ESS_v03_M_SPSS`,
   `ETH_2015_ESS_v03_M_CSV`, `ETH_2018_ESS_v04_M_CSV`,
@@ -139,9 +154,10 @@ project pitch/motivation.
   end of `02_feature_exploration.ipynb`) is the actual file to start
   modeling from — `crop_loss_master_all.csv` reindexed down to the clean
   12-column feature set, leakage/unreliable columns dropped, missing values
-  resolved, crop-name spelling variants merged (101 crops), re-aggregated
-  to one row per `household_id`+`crop_name`+`survey_year` (72,488 rows),
-  0 duplicates, `household_id` still included
+  resolved (including dropping `crop_name = UNKNOWN` rows entirely — see
+  "Prediction task" below), crop-name spelling variants merged (100 crops),
+  re-aggregated to one row per `household_id`+`crop_name`+`survey_year`
+  (70,563 rows), 0 duplicates, `household_id` still included
   and the data still whole (not train/test split — see "Prediction task"
   below for why the split is deliberately deferred to model-training time).
 - `model/` — written by `04_xgboost.ipynb` section 18.
@@ -259,11 +275,11 @@ project pitch/motivation.
   without unit harmonization first (unsolved).
 - **Target**: `loss_occurred` = `(total_loss_qty.fillna(0) > 0)`. `NaN` in
   `total_loss_qty` means "no loss entry recorded for this crop," treated as
-  no-loss. Class split is **93.3% no-loss / 6.7% loss** in the final
-  `crop_loss_model_ready.csv` (93.5%/6.5% before the `crop_code` cleanup and
-  grain re-aggregation below nudged it slightly) — strongly imbalanced; any
-  model needs explicit handling (class weighting, resampling, or a metric
-  other than plain accuracy) rather than being trained naively.
+  no-loss. Class split is **93.1% no-loss / 6.9% loss** in the final
+  `crop_loss_model_ready.csv` (93.5%/6.5% right after the target is built,
+  before any row drops) — strongly imbalanced; any model needs explicit
+  handling (class weighting, resampling, or a metric other than plain
+  accuracy) rather than being trained naively.
 - **`total_loss_qty` itself is built from `loss_reason1/2/3_qty`** (summed
   across up to 3 reported loss reasons per household+crop, after first
   summing across that household's parcels/fields for the same crop). Because
@@ -294,10 +310,18 @@ project pitch/motivation.
 - **Missing values**: the 381-row household-join-gap cluster is **dropped**
   (imputing region/rainfall for a row where it's genuinely unknown would
   inject a wrong value into what's otherwise a real predictive signal).
-  `crop_name` missing independently (5.2%) is **recoded to an explicit
-  "Unknown" category** (`"UNKNOWN"`) rather than mode-imputed or dropped, to
-  avoid biasing toward the most common crop and to keep those rows'
-  `loss_occurred` label.
+  `crop_name` missing independently (5.2%) was **originally recoded to an
+  explicit "Unknown" category** (`"UNKNOWN"`) rather than mode-imputed or
+  dropped, to avoid biasing toward the most common crop and to keep those
+  rows' `loss_occurred` label — reasonable under the assumption the
+  missingness was random. **Reversed** after `04_xgboost.ipynb` found that
+  assumption doesn't hold: all 1,925 `UNKNOWN` rows have `loss_occurred =
+  0`, a recording artifact (crop detail wasn't logged when there was
+  nothing to report) rather than independent noise. The model had learned
+  `UNKNOWN = no loss` as its single strongest signal, and since the
+  frontend never sends `UNKNOWN`, keeping those rows only inflated every
+  reported test score with something the app will never see live.
+  **`crop_name`-missing rows are now dropped**, not recoded.
 - **Duplicate check caught two real bugs**, not one:
   1. See the household-ID float-precision gotcha below — fixed upstream in
      `01_data_exploration.ipynb`.
@@ -313,16 +337,18 @@ project pitch/motivation.
      `loss_occurred` via `"max"` (did this household have *any* loss on this
      crop that year). The same step also collapses the rows that the
      crop-name spelling merge (see the gotcha below) turned into
-     duplicates. Together these took `df_model` from 74,696 down to its
-     final 72,488 rows (5 groups with conflicting `loss_occurred`, resolved
+     duplicates. Together these took `df_model` from 70,882 down to its
+     final 70,563 rows (5 groups with conflicting `loss_occurred`, resolved
      by `"max"`). 0 duplicates now, both full-row and on the
-     `household_id`+`crop_name`+`survey_year` grain.
+     `household_id`+`crop_name`+`survey_year` grain. (70,882 is the row
+     count after also dropping the `crop_name = UNKNOWN` rows — see
+     "Missing values" above; before that drop it was 74,696.)
 - **Small sample sizes**: `region_name` (10 values) and `survey_year` (5
   values) are low-cardinality with thousands of rows each, but `crop_name`
-  has 101 distinct values (189 before the Wave 2021 double-prefix bug was
-  fixed, 123 before the spelling-variant merge — see the gotchas below) and
+  has 100 distinct values (189 before the Wave 2021 double-prefix bug was
+  fixed, 122 before the spelling-variant merge — see the gotchas below) and
   21 of them have fewer than 30 rows — a loss rate computed on that few rows
-  is mostly noise given the 6.7% base rate.
+  is mostly noise given the 6.9% base rate.
   Not fixed at the data-prep stage. `04_xgboost.ipynb` tested grouping rare
   crops into an "other" bucket (see its section 9) and handles thin
   region×crop combinations with a `limited_data` flag instead.
@@ -420,13 +446,28 @@ project pitch/motivation.
   `WHITECUMIN`). Each group was confirmed to be one crop by its shared
   numeric `crop_code` outside Wave 2013. **Fixed in
   `02_feature_exploration.ipynb`** with an explicit `CROP_NAME_FIXES`
-  dictionary (123 → 101 crops), not in `01`: 01 needs `data/raw/`, which
+  dictionary (122 → 100 crops, after `crop_name = UNKNOWN` rows are also
+  dropped — see below), not in `01`: 01 needs `data/raw/`, which
   isn't in every clone, so `crop_loss_master_all.csv` still carries the raw
   spellings. The cell asserts that no two remaining names differ only by
   spacing, punctuation or case, so a new variant from a future re-run of 01
   fails loudly instead of slipping through. A handful of rows (1-5 per code)
   carry a numeric `crop_code` that belongs to a different crop than their
   `crop_name` — data-entry noise, left as is.
+- **`crop_name = UNKNOWN` rows are dropped, not kept as a category —
+  reversed from an earlier design decision.** `02_feature_exploration.ipynb`
+  originally recoded `crop_name`-missing rows (5.2%) to `"UNKNOWN"` rather
+  than mode-imputing or dropping, on the assumption the missingness was
+  random. `04_xgboost.ipynb` found that assumption false: all 1,925
+  `UNKNOWN` rows have `loss_occurred = 0` — a recording artifact (no loss
+  can be logged against an unnamed crop) rather than independent noise. The
+  model learned `UNKNOWN = no loss` as its single strongest signal (top
+  SHAP value in the whole model), and since the app's frontend never sends
+  `UNKNOWN` (a user always selects a real crop), keeping those rows just
+  inflated every reported metric with a case that will never occur live.
+  **Takeaway for future missing-value decisions here**: don't assume
+  missingness is independent of the target without checking — cross-tab it
+  against `loss_occurred` (or whatever the target is) first.
 - The notebook can grow too large for the `Read` tool once it's been executed
   (outputs embedded). If `Read`/`NotebookEdit` fail on size, edit the
   underlying `.ipynb` JSON directly with a small Python script

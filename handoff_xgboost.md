@@ -5,6 +5,45 @@ For Ashenafi, from Azmain. Everything below is committed and pushed to `main`
 
 ---
 
+## Update — 21 September 2026: `UNKNOWN` rows dropped, "Bottom line" below has moved
+
+*(Added by Claude, at Ashenafi's direction — Azmain's original message below
+is otherwise untouched.)*
+
+Resolves decision #2 at the bottom of this doc: `crop_name`-missing rows are
+now **dropped** in `02` instead of recoded to `"UNKNOWN"` — all 1,925 had
+`loss_occurred = 0`, the recording artifact Azmain flagged below, not real
+signal. `02`, `03` and `04` were re-run end to end on the corrected data
+(70,563 rows, 100 crops; `03`'s split is now 56,395/14,168 train/test, 116
+`X_train_no_year` columns).
+
+**The "Bottom line" table below no longer holds.** After the drop, the two
+models are essentially tied on the test set:
+
+| | RF baseline (`03`) | XGBoost (`04`) |
+|---|---|---|
+| Test ROC-AUC | **0.7924** | 0.7923 |
+| Test PR-AUC | **0.2066** | 0.2056 |
+| Test precision | **0.1416** | 0.1388 |
+| Test recall | 0.6996 | **0.7262** |
+
+XGBoost is marginally behind on ROC-AUC, PR-AUC and precision (well within
+noise) and ahead only on recall (+2.7 points — 18 more real losses caught at
+this threshold). Azmain's original "XGBoost wins, real but small" read was
+substantially driven by the `UNKNOWN` rows inflating both models' scores
+unevenly. This is recorded as a new section 20 in `04_xgboost.ipynb`, added
+without editing Azmain's original sections 1-19 — their markdown write-up
+(including the "Bottom line" table below) still describes the pre-fix
+numbers and hasn't been rewritten.
+
+**Everything else in this document is unaffected and still holds**: the
+crop-name bug, the CV methodology, the imbalance/threshold/`household_size`
+decisions, and the feature-importance findings. Only the head-to-head
+verdict changes. Exact numbers in those other sections haven't been
+individually re-verified against the post-fix re-run (only this table has).
+
+---
+
 ## Read this first: two things I did against your instructions
 
 Your message said to use `data/processed/crop_loss_model_ready.csv` as it was,
@@ -264,6 +303,8 @@ train-only fit, which stays the honest estimate.
 
 1. **The crop-name fix**: keep it in `02`, move it to `01`, or revert it?
 2. **`UNKNOWN` rows**: drop them in `02`, or keep them as a category?
+   **[Resolved 21 Sept — dropped. See the update at the top of this
+   document.]**
 3. **Threshold**: is 75% recall the right product target? At that setting,
    roughly 5 of every 6 alarms are false — fine for "check these farms first",
    not fine for anything that triggers expensive action on its own.

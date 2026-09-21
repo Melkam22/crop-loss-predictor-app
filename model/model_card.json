@@ -1,7 +1,7 @@
 {
   "model": "XGBoost (scikit-learn Pipeline: one-hot encoding + XGBClassifier)",
   "built_by": "notebooks/04_xgboost.ipynb",
-  "trained_on": "data/processed/crop_loss_model_ready.csv, all 72,488 rows",
+  "trained_on": "data/processed/crop_loss_model_ready.csv, all 70,563 rows",
   "target": "loss_occurred (1 = any post-harvest loss recorded for this household+crop+year)",
   "inputs": {
     "crop_name": "user picks (dropdown); unseen names are treated as 'no crop column set'",
@@ -119,7 +119,6 @@
     "TOBACCO",
     "TOMATOES",
     "TUMERIC",
-    "UNKNOWN",
     "VETCH",
     "WATERMELON",
     "WEPAL",
@@ -139,42 +138,42 @@
     15
   ],
   "rare_crops_grouped_as_other": null,
-  "decision_threshold": 0.497841,
+  "decision_threshold": 0.490557,
   "threshold_rule": "highest threshold with >= 75% recall on out-of-fold training predictions",
   "score_is_probability": false,
   "imbalance_strategy": "scale_pos_weight",
-  "n_estimators": 121,
+  "n_estimators": 92,
   "xgboost_params": {
-    "learning_rate": 0.093916,
-    "max_depth": 8,
-    "min_child_weight": 1.489474,
-    "subsample": 0.957561,
-    "colsample_bytree": 0.447494,
-    "gamma": 9.35347,
-    "reg_lambda": 15.615953,
-    "reg_alpha": 0.100496,
-    "scale_pos_weight": 13.94523
+    "learning_rate": 0.055147,
+    "max_depth": 10,
+    "min_child_weight": 29.106359,
+    "subsample": 0.799329,
+    "colsample_bytree": 0.409213,
+    "gamma": 0.004207,
+    "reg_lambda": 0.017074,
+    "reg_alpha": 2.915443,
+    "scale_pos_weight": 13.230381
   },
   "cv_5fold_grouped": {
-    "pr_auc": 0.2219,
-    "roc_auc": 0.7999
+    "pr_auc": 0.2294,
+    "roc_auc": 0.7927
   },
   "test_set": {
-    "ROC-AUC": 0.8142,
-    "PR-AUC": 0.2309,
-    "precision": 0.1563,
-    "recall": 0.7725,
-    "F1": 0.26
+    "ROC-AUC": 0.7923,
+    "PR-AUC": 0.2056,
+    "precision": 0.1388,
+    "recall": 0.7262,
+    "F1": 0.2331
   },
   "test_set_known_crops_only": {
-    "ROC-AUC": 0.8084,
-    "PR-AUC": 0.2309,
-    "precision": 0.1563,
-    "recall": 0.7725
+    "ROC-AUC": 0.7923,
+    "PR-AUC": 0.2056,
+    "precision": 0.1388,
+    "recall": 0.7262
   },
   "baseline_rf_test": {
-    "ROC-AUC": 0.8095,
-    "PR-AUC": 0.2232
+    "ROC-AUC": 0.7924,
+    "PR-AUC": 0.2066
   },
   "limited_data_rule": "region+crop combinations with < 30 rows: see region_crop_support.csv",
   "library_versions": {
