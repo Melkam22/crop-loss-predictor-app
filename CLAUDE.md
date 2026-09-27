@@ -139,6 +139,13 @@ project pitch/motivation.
   **Not yet done**: probability calibration; the backend itself; a full
   re-verification of sections 8-17's exact CV numbers post-fix (only the
   final test-set comparison in section 20 has been directly re-checked).
+- `experiments/xgb_tuning_variants/` — **experimental, not adopted.** Side
+  experiment testing tuning/feature variations for XGBoost on `04`'s training
+  folds, confirmed on 10 fresh grouped folds, test set untouched. Best result:
+  native categoricals + a region×crop pair feature, PR-AUC 0.2264 vs tuned
+  RF's 0.2224 (wins 7/10 folds, so it fails the all-folds rule). RF hasn't yet
+  been given the same feature. See its `README.md`. Nothing in `04`/`model/`
+  was changed by it.
 - `data/raw/` — gitignored, not tracked. Contains one folder per LSMS wave
   (`ETH_2011_ERSS_v02_M_CSV`, `ETH_2013_ESS_v03_M_SPSS`,
   `ETH_2015_ESS_v03_M_CSV`, `ETH_2018_ESS_v04_M_CSV`,

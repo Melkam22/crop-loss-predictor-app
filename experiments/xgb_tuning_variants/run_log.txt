@@ -1,0 +1,21 @@
+reference on search folds: PR-AUC 0.2260
+onehot, wider search + spw tuned: best search PR-AUC 0.2298 (trial 43) in 14.9 min
+native categorical: best search PR-AUC 0.2304 (trial 14) in 5.4 min
+native + region×crop: best search PR-AUC 0.2327 (trial 30) in 4.0 min
+onehot + target-encoded rates: best search PR-AUC 0.2322 (trial 30) in 9.9 min
+native + target-encoded rates: best search PR-AUC 0.2309 (trial 47) in 6.7 min
+
+confirming on 10 fresh folds...
+
+model                                         search PR confirm PR confirm ROC folds > 04 XGB
+RF baseline (03)                                      - 0.2175±0.014 0.7923      4/10
+RF tuned (04)                                         - 0.2224±0.013 0.7945      6/10
+04 tuned XGBoost (reference)                     0.2260 0.2209±0.015 0.7931      0/10
+onehot, wider search + spw tuned                 0.2298 0.2228±0.015 0.7964      7/10
+native categorical                               0.2304 0.2192±0.019 0.7929      5/10
+native + region×crop                             0.2327 0.2264±0.018 0.7995      8/10
+onehot + target-encoded rates                    0.2322 0.2258±0.017 0.7989      7/10
+native + target-encoded rates                    0.2309 0.2229±0.021 0.7964      6/10
+native + region×crop, 5-seed average                  - 0.2267±0.017 0.8000      9/10
+
+total 45.2 min
