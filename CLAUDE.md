@@ -141,11 +141,13 @@ project pitch/motivation.
   final test-set comparison in section 20 has been directly re-checked).
 - `experiments/xgb_tuning_variants/` — **experimental, not adopted.** Side
   experiment testing tuning/feature variations for XGBoost on `04`'s training
-  folds, confirmed on 10 fresh grouped folds, test set untouched. Best result:
-  native categoricals + a region×crop pair feature, PR-AUC 0.2264 vs tuned
-  RF's 0.2224 (wins 7/10 folds, so it fails the all-folds rule). RF hasn't yet
-  been given the same feature. See its `README.md`. Nothing in `04`/`model/`
-  was changed by it.
+  folds, confirmed on 10 fresh grouped folds, test set untouched. Finding: a
+  smoothed historical loss rate per crop and per region×crop pair
+  (target-encoded, out-of-fold) lifts RF from 0.2224 to 0.2259 PR-AUC in all
+  10 folds, and with it XGBoost (0.2264) and RF are tied again. So the gain is
+  the feature, not the algorithm. Adopting it (option B) vs keeping `04`
+  as-is (option A) is an open decision. See its `README.md`. Nothing in
+  `04`/`model/` was changed by it.
 - `data/raw/` — gitignored, not tracked. Contains one folder per LSMS wave
   (`ETH_2011_ERSS_v02_M_CSV`, `ETH_2013_ESS_v03_M_SPSS`,
   `ETH_2015_ESS_v03_M_CSV`, `ETH_2018_ESS_v04_M_CSV`,

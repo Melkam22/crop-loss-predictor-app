@@ -1,0 +1,10 @@
+RF + region×crop (one-hot): best search PR-AUC 0.2253 (trial 0) in 37.4 min
+RF + target-encoded rates: best search PR-AUC 0.2315 (trial 1) in 19.0 min
+
+confirming on the same 10 fresh folds...
+
+model                                    confirm PR     ROC  > RF tuned  XGB best >
+RF + region×crop (one-hot)             0.2237±0.014 0.7956      7/10        7/10   (XGB best minus this: +0.0028)
+RF + target-encoded rates              0.2259±0.013 0.8009     10/10        7/10   (XGB best minus this: +0.0005)
+
+total 63.3 min

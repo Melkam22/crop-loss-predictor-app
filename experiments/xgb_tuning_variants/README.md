@@ -1,5 +1,10 @@
 # Experiment: can XGBoost get honestly better?
 
+**Short answer: not XGBoost itself, but a new feature helps both models.**
+The historical loss rate per region+crop pair (target-encoded) lifts Random
+Forest in all 10 fresh folds. With that feature, XGBoost and Random Forest are
+tied again (PR-AUC 0.2264 vs 0.2259). See "Part 2" below.
+
 **Status: experimental. Nothing here is adopted.** `notebooks/04_xgboost.ipynb`,
 `model/` and the official baseline are unchanged. This folder is a side
 experiment, kept separate so it can't disturb the main pipeline.
@@ -69,14 +74,47 @@ features give XGBoost a real edge, **without** fooling ourselves.
   which the form already collects.
 - **Not yet a fair fight**: Random Forest was never given the region×crop
   feature. Part or all of this gain might be "a better feature", not "a
-  better algorithm".
+  better algorithm". Part 2 checks this.
 
-## Open next steps
+## Part 2: Random Forest gets the same feature (`rf_region_crop.py`)
 
-1. Give tuned RF the same region×crop feature and re-check on the fresh folds.
-2. If XGBoost still leads, score that one finalist on the test set once.
-3. Only then fold it into `04` (as a new section), rebuild `model/`, and
-   update `CLAUDE.md`.
+Same method: Optuna on `04`'s 5 folds using `04`'s own RF search space, each
+study started from `04`'s tuned RF, then confirmed on the **same** 10 fresh
+folds. That makes the results pair fold-by-fold with Part 1. Test set still
+untouched.
+
+| RF variant | Trials | PR-AUC | ROC-AUC | Folds beating tuned RF (no feature) | Folds XGBoost's best beats it |
+|---|---|---|---|---|---|
+| RF + region×crop (one-hot, ~700 extra columns) | 20* | 0.2237 ± 0.014 | 0.7956 | 7/10 | 7/10 |
+| **RF + target-encoded rates** | 50 | **0.2259 ± 0.013** | **0.8009** | **10/10** | 7/10 (mean gap +0.0005) |
+
+\* ~3 min per trial with the extra columns, so it got a smaller budget. Its
+best was still `04`'s starting settings, so more trials were unlikely to help.
+
+Best RF + target-encoded settings: `max_depth=23`, `min_samples_leaf=18`,
+`max_features=0.2`, `class_weight="balanced_subsample"`, smoothing `m≈82`.
+
+## Overall conclusion
+
+- **The feature is the real finding.** Adding a smoothed historical loss rate
+  for each crop and each region+crop pair beats `04`'s tuned RF in **all 10**
+  fresh folds (0.2224 → 0.2259 PR-AUC, ROC-AUC 0.7945 → 0.8009). It is the
+  only change in this experiment that passes the project's all-folds rule.
+- **The algorithm is not.** With the feature, XGBoost's best (0.2264) and RF
+  (0.2259) are tied, a 0.0005 gap that is within noise. XGBoost's apparent
+  lead in Part 1 came from the feature, not from XGBoost.
+- **Cost of adopting it**: the backend would need a lookup table of those
+  loss rates (per crop, per region+crop), saved next to the model and built
+  from training data only. `model/region_crop_support.csv` already stores
+  a raw version of this. No new form fields.
+
+## Decision needed (not taken yet)
+
+- **Option A: keep the old way.** `04`'s XGBoost as-is, no new feature.
+- **Option B: adopt the feature.** Add the target-encoded rates to `04` as a
+  new section, pick RF or XGBoost (tied, so the simpler one to ship), score
+  that one finalist on the test set once, then rebuild `model/` and update
+  `CLAUDE.md`.
 
 ## Files
 
@@ -88,3 +126,7 @@ features give XGBoost a real edge, **without** fooling ourselves.
 - `results.json`: per-fold PR-AUC/ROC-AUC for both stages, plus each
   variant's best hyperparameters (`best_params`).
 - `run_log.txt`: console output of the run above.
+- `rf_region_crop.py`: Part 2, the Random Forest fairness check (~63 min).
+  Run after `xgb_variants.py`, since it reads `results.json` to compare
+  fold by fold.
+- `results_rf.json` / `run_log_rf.txt`: Part 2's results and console output.
