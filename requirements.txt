@@ -16,9 +16,11 @@ shap==0.49.1
 optuna==5.0.0  # hyperparameter tuning (04_xgboost.ipynb)
 imbalanced-learn==0.14.2  # SMOTE-NC comparison (04_xgboost.ipynb)
 
-# Backend (planned: FastAPI -> Render)
+# Backend (FastAPI -> Render; see backend/requirements.txt for the leaner
+# set actually installed in the backend's Docker image)
 fastapi==0.141.1
 uvicorn==0.53.0
+requests==2.34.2  # backend/app/rainfall_service.py -- CHIRPS CSV refresh
 
 # Frontend (planned: Streamlit -> Streamlit Cloud)
 streamlit==1.64.0

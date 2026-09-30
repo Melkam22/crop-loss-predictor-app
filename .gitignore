@@ -12,6 +12,10 @@ data/raw/*
 # Model artifacts
 *.pkl
 *.joblib
+# Deliberate exception: the deployed model snapshot Render's build needs
+# (Render clones from git, no local volume mount like docker-compose has).
+# Regenerate via 04_xgboost.ipynb and recommit when retraining changes it.
+!model/harvestguard_xgb.joblib
 
 # Notebooks
 .ipynb_checkpoints/

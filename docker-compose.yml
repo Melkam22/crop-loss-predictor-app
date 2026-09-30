@@ -1,0 +1,19 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./model:/app/model:ro
+      - ./data/raw/CHIRPS:/app/data/raw/CHIRPS
+    environment:
+      - MODEL_DIR=/app/model
+      - CHIRPS_CSV_PATH=/app/data/raw/CHIRPS/eth-rainfall-subnat-full.csv
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

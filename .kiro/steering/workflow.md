@@ -38,6 +38,26 @@
   embedded output). Executed outputs are the evidence the pipeline actually
   ran, so don't strip them to tidy up diffs.
 
+## Backend / Docker
+
+- `backend/` (FastAPI) runs via Docker, not the `harvestguard` pyenv env:
+  `docker compose up --build`, then e.g. `curl -X POST localhost:8000/predict
+  -d '{"crop_name":"MAIZE","region_code":1,"household_size":5}'`.
+- `docker-compose.yml` mounts `model/` (read-only) and `data/raw/CHIRPS/`
+  (read-write) from the host, so `04`-rebuilt models and CHIRPS refreshes
+  don't require rebuilding the image.
+- Rainfall is fetched from HDX's direct resource-download link (not the CKAN
+  API, which 403'd) on a daily schedule, overwriting
+  `data/raw/CHIRPS/eth-rainfall-subnat-full.csv` in place — see CLAUDE.md's
+  `backend/` entry for the full mechanism and the partial-season fallback
+  rule.
+- Deployed on Render via `render.yaml` (repo root) — Docker build, context is
+  the repo root (not `backend/`) so the image can `COPY model ./model` at
+  build time, since Render has no volume-mount equivalent to
+  `docker-compose.yml`'s. This is *why* `model/harvestguard_xgb.joblib` is
+  committed despite being gitignored elsewhere (see CLAUDE.md's `model/`
+  entry) — Render's build has nothing else to load it from.
+
 ## Git
 
 - Work on `main` with remote `origin` (`Melkam22/crop-loss-predictor-app`).

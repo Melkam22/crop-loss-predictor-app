@@ -1,0 +1,13 @@
+# Backend serving deps only -- kept separate from the root requirements.txt,
+# which also pulls in jupyterlab/shap/optuna/etc. that a production image
+# doesn't need. scikit-learn/xgboost/pandas/numpy pins match both the root
+# requirements.txt and model/model_card.json's library_versions exactly --
+# a differing version can subtly change tree ensemble output.
+fastapi==0.141.1
+uvicorn==0.53.0
+requests==2.34.2
+scikit-learn==1.6.1
+xgboost==2.1.4
+pandas==2.2.3
+numpy==1.26.4
+joblib==1.6.0

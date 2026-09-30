@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: harvestguard-api
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: MODEL_DIR
+        value: /app/model
+      - key: CHIRPS_CSV_PATH
+        value: /app/data/raw/CHIRPS/eth-rainfall-subnat-full.csv

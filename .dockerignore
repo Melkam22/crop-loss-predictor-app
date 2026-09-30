@@ -1,0 +1,14 @@
+# Build context is the repo root (see backend/Dockerfile). Keep it small --
+# notebooks/data/experiments aren't needed at build time (CHIRPS is fetched
+# live at container startup, not baked into the image; model/ is the one
+# exception the Dockerfile explicitly COPYs).
+notebooks/
+data/
+experiments/
+.git/
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+.DS_Store

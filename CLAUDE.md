@@ -173,29 +173,106 @@ project pitch/motivation.
   `harvestguard_xgb.joblib` is a scikit-learn `Pipeline` (one-hot encoding +
   XGBoost) refit on all 72,488 rows. It takes raw columns in
   `model_card.json`'s `input_column_order` and returns a score to compare
-  against `decision_threshold`. It's **gitignored** (`*.joblib`), so rebuild
-  it by running `04`. `model_card.json` (inputs and where each comes from,
+  against `decision_threshold`. It's **gitignored** (`*.joblib`) — rebuild
+  it by running `04` — **except for one narrow, deliberate exception**:
+  `!model/harvestguard_xgb.joblib` in `.gitignore` commits this one file,
+  because Render's build clones the repo with no local volume mount to lean
+  on (unlike `docker-compose.yml`, which mounts `model/` from disk). This is
+  a deployment necessity, not a reversal of the "regenerate via 04" rule —
+  regenerate it the same way, then recommit it if retraining changes it
+  materially. `model_card.json` (inputs and where each comes from,
   threshold, settings, CV/test scores, library versions) and
   `region_crop_support.csv` (rows and loss rate per region+crop, plus a
-  `limited_data` flag for <30 rows) are tracked.
-- `backend/`, `frontend/` — empty so far, not yet started.
-  **Frontend input design, decided ahead of building it**: not every
-  feature the model needs should be a manual input field. `crop_name` and
-  `region_code` (dropdown, or GPS resolved to a region server-side) are the
-  genuine user inputs. **`household_size` is also asked**: `04` measured it
-  (section 10) and it improves the model in every CV fold. Dropping it
-  would cost ~2% relative PR-AUC for a shorter form, a product call that
-  can be reversed by flipping `KEEP_HOUSEHOLD_SIZE` in `04` and re-running. `is_rural` should be hardcoded/defaulted, not asked —
-  the app's whole audience is smallholder farmers, so it's ~always 1.
-  **The four rainfall columns (`rainfall_belg_mm`/`_pct_of_avg`,
-  `rainfall_meher_mm`/`_pct_of_avg`) must never be manual entry fields** —
-  no farmer knows exact seasonal rainfall in mm or % of average. The
-  FastAPI backend should fetch current-season rainfall automatically for
-  the selected region (from CHIRPS or a similar live weather API, the same
-  source the training data came from) once crop+region are chosen, and
-  compute those four features server-side before calling the model. This
-  shapes the backend's request schema, so decide it before that endpoint is
-  built, not after.
+  `limited_data` flag for <30 rows) are tracked as before.
+- `backend/` — FastAPI service (built; run via `docker compose up --build`,
+  no host Python/pyenv involved). Implements the input design below.
+  `backend/app/`: `main.py` (app + lifespan — loads the model once, ensures
+  the CHIRPS CSV is present, spawns a daily background refresh task),
+  `config.py` (paths + the CHIRPS resource URL, all env-overridable),
+  `model_service.py` (loads `harvestguard_xgb.joblib` +`model_card.json` +
+  `region_crop_support.csv`; reads `decision_threshold`/`known_crops`/
+  `known_region_codes` from the model card rather than hardcoding them, so
+  they can't drift from the artifact), `rainfall_service.py` (rainfall
+  features — see below), `schemas.py` (Pydantic request/response models).
+  Endpoints: `POST /predict` (body: `crop_name`, `region_code`,
+  `household_size` — the three genuine manual inputs, see below), `GET
+  /regions` (`region_code`+`region_name` pairs, deduped from
+  `region_crop_support.csv` — for a frontend dropdown, so the region-name
+  mapping isn't hand-duplicated on the frontend too), `GET /crops` (the 100
+  `known_crops` from `model_card.json`, same reasoning), `GET /health`,
+  `POST /admin/refresh-rainfall` (manual trigger, no auth yet — fine for
+  local/dev, add before any public deploy). `backend/requirements.txt`
+  is a leaner, backend-only subset of the root `requirements.txt` (no
+  jupyterlab/shap/optuna/etc.), pinned to the same scikit-learn/xgboost/
+  pandas/numpy versions as `model_card.json`'s `library_versions`, since a
+  differing version can subtly change tree ensemble output. `backend/Dockerfile`
+  installs `libgomp1` (Linux's xgboost wheels need it, same reason macOS
+  needs `brew install libomp`). `docker-compose.yml` (repo root) mounts
+  `model/` read-only and `data/raw/CHIRPS/` read-write into the container —
+  locally this volume mount shadows whatever's baked into the image, so
+  retraining via `04` doesn't require an image rebuild for local dev (the
+  baked-in `model/` copy — see below — is only actually used on Render,
+  where no such mount exists).
+
+  **Deployment (Render)**: `render.yaml` (repo root) declares this as a
+  Docker web service — `dockerfilePath: backend/Dockerfile`,
+  `dockerContext: .` (repo root, not `backend/`, specifically so the
+  Dockerfile can also `COPY model ./model` at build time — Render has no
+  volume-mount equivalent), `healthCheckPath: /health`. Deploy via Render's
+  dashboard: New → Blueprint → connect the `Melkam22/crop-loss-predictor-app`
+  GitHub repo → it detects `render.yaml`. CORS is enabled permissively
+  (`allow_origins=["*"]`) in `main.py` for now — tighten once the frontend's
+  real domain is known. Free-tier web services spin down after ~15 min
+  idle, so the first request after a while can take 30-60s to wake — expected,
+  not a bug. **The API contract for the frontend**: the deployed base URL's
+  `/docs` (Swagger UI, auto-generated from `schemas.py`) is the integration
+  point — no separate API doc needed.
+
+  **Rainfall — live, not manual entry**: not every feature the model needs
+  should be a manual input field. `crop_name` and `region_code` (dropdown,
+  or GPS resolved to a region server-side) are the genuine user inputs.
+  **`household_size` is also asked**: `04` measured it (section 10) and it
+  improves the model in every CV fold. Dropping it would cost ~2% relative
+  PR-AUC for a shorter form, a product call that can be reversed by
+  flipping `KEEP_HOUSEHOLD_SIZE` in `04` and re-running. `is_rural` is
+  hardcoded to 1.0 server-side, never asked — the app's whole audience is
+  smallholder farmers, so it's ~always 1. **The four rainfall columns
+  (`rainfall_belg_mm`/`_pct_of_avg`, `rainfall_meher_mm`/`_pct_of_avg`) are
+  never manual entry fields** — no farmer knows exact seasonal rainfall in
+  mm or % of average; `rainfall_service.py` computes them server-side.
+
+  **CHIRPS source — the direct resource-download link, not the CKAN API**:
+  HDX's JSON API (`/api/3/action/package_show?id=...`) 403'd when tested
+  from this machine; the resource's direct download link (copied by hand
+  from the dataset's Download button on
+  `https://data.humdata.org/dataset/eth-rainfall-subnational`) worked —
+  it's a stable URL that 302-redirects to a freshly pre-signed S3 URL on
+  every request, so hitting it always returns the current file. A
+  scheduled `refresh_chirps_csv()` (daily, `CHIRPS_REFRESH_INTERVAL_SECONDS`)
+  does a plain `requests.get` on that URL and **overwrites
+  `data/raw/CHIRPS/eth-rainfall-subnat-full.csv` in place** — the same file
+  `01_data_exploration.ipynb` reads, so nothing about the notebook pipeline
+  changes. Prediction requests never hit the network themselves; they read
+  an in-memory cache built from that file, reloaded after each refresh.
+  `rainfall_service.py`'s season aggregation is ported verbatim from
+  `01_data_exploration.ipynb` Part 8 (raw CHIRPS → region-level dekadal
+  rows: `adm_level==1`, `version=='final'` only, `region_code` from
+  `PCODE`) and Part 9's `season_agg` (`SEASON_MONTHS` = Belg Feb-May, Meher
+  Jun-Sep; sum `rfh`/`rfh_avg` per region+year+season, `pct_of_avg` = their
+  ratio ×100) — so live features are computed identically to how the
+  training data was built.
+
+  **Partial-season handling (new, not in the notebook)**: the model only
+  ever saw *complete* Belg/Meher seasons in training, so a live request
+  mid-season falls back to the most recently complete season of that type
+  instead of summing a partial one (e.g. in July, Belg(this year) is
+  already complete and used directly, but Meher(this year) is only half
+  over, so Meher(last year) is used instead). This also guards against
+  CHIRPS reporting lag: if the "complete" season's dekad count comes up
+  short (some still marked `prelim` and filtered out), it falls back a
+  further year rather than silently scoring on partial data — surfaced to
+  the caller via the response's `warnings` list.
+- `frontend/` — empty, not yet started (Streamlit, per `description.md`).
 - `.kiro/steering/` — pulls `CLAUDE.md` in as Kiro's project memory
   (`project-context.md`) plus a `workflow.md` with environment/git
   conventions, so Kiro and Claude share one memory file instead of drifting
