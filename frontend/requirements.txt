@@ -1,0 +1,4 @@
+# Frontend-only dependencies (Streamlit Community Cloud installs this file,
+# since it sits next to app.py). Same versions as the root requirements.txt.
+streamlit==1.64.0
+requests==2.34.2

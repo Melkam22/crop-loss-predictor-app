@@ -22,6 +22,7 @@ data/raw/*
 
 # Env / secrets
 .env
+.streamlit/secrets.toml
 
 # OS
 .DS_Store

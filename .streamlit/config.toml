@@ -1,0 +1,20 @@
+# Streamlit reads this from the directory `streamlit run` is launched from.
+# Streamlit Community Cloud launches from the repo root, so it lives here
+# rather than in frontend/.
+
+[theme]
+base = "dark"
+primaryColor = "#f2c14e"
+backgroundColor = "#0a0f0b"
+secondaryBackgroundColor = "#141d16"
+textColor = "#ecf2ec"
+borderColor = "#263328"
+baseRadius = "0.75rem"
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+headingFont = "Space Grotesk:https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap"
+
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false

@@ -272,7 +272,23 @@ project pitch/motivation.
   short (some still marked `prelim` and filtered out), it falls back a
   further year rather than silently scoring on partial data — surfaced to
   the caller via the response's `warnings` list.
-- `frontend/` — empty, not yet started (Streamlit, per `description.md`).
+- `frontend/` — Streamlit app (`app.py` + `styles.css`), calls the Render
+  API (`API_URL` from Streamlit secrets, falls back to the deployed Render
+  URL; see `secrets.toml.example`). Run from the repo root so the theme in
+  `.streamlit/config.toml` applies: `streamlit run frontend/app.py`. Two
+  views switched by `?page=predict` (landing page with hero/about cards/
+  how-it-works/team footer, and the predict form + result). Shows High/Low
+  only, never the score (it isn't a probability), plus `limited_data`,
+  `warnings` and the rainfall used. Hides 4 non-crop entries from `/crops`
+  (`GRAZING LAND`, `OTHER LAND USE`, `TEMPORARY GR`, `OTHERS`).
+  `frontend/requirements.txt` is the lean list Streamlit Cloud installs.
+  **Streamlit 1.64 gotchas**: `st.html` sanitizes with DOMPurify's HTML-only
+  profile, so it strips `<style>` and `<svg>` — the stylesheet goes in via
+  `st.markdown(..., unsafe_allow_html=True)` with blank lines removed, and
+  the hero illustration is an SVG embedded as a base64 `<img>` (its
+  animations live in the SVG's own `<style>`). Don't use a `<footer>` tag:
+  the CSS hides `footer` to remove Streamlit's chrome. Styling hooks for
+  widgets are the `st-key-<key>` classes Streamlit adds to keyed elements.
 - `.kiro/steering/` — pulls `CLAUDE.md` in as Kiro's project memory
   (`project-context.md`) plus a `workflow.md` with environment/git
   conventions, so Kiro and Claude share one memory file instead of drifting
